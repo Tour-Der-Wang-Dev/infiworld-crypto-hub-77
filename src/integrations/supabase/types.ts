@@ -9,6 +9,21 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      infiworld: {
+        Row: {
+          created_at: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       reservations: {
         Row: {
           adults: number
@@ -18,13 +33,11 @@ export type Database = {
           departure_date: string
           destination: string
           id: string
-          payment_intent: string | null
           price: number
-          provider: string | null
+          provider: string
           return_date: string | null
           status: string
           type: string
-          updated_at: string | null
           user_id: string | null
         }
         Insert: {
@@ -35,13 +48,11 @@ export type Database = {
           departure_date: string
           destination: string
           id?: string
-          payment_intent?: string | null
           price: number
-          provider?: string | null
+          provider: string
           return_date?: string | null
           status?: string
           type: string
-          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
@@ -52,13 +63,11 @@ export type Database = {
           departure_date?: string
           destination?: string
           id?: string
-          payment_intent?: string | null
           price?: number
-          provider?: string | null
+          provider?: string
           return_date?: string | null
           status?: string
           type?: string
-          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -67,7 +76,7 @@ export type Database = {
         Row: {
           accepted_crypto: string[]
           address: string
-          category: string
+          category: string | null
           created_at: string | null
           id: string
           latitude: number
@@ -75,13 +84,12 @@ export type Database = {
           name: string
           opening_hours: string | null
           phone: string | null
-          updated_at: string | null
           website: string | null
         }
         Insert: {
-          accepted_crypto: string[]
+          accepted_crypto?: string[]
           address: string
-          category: string
+          category?: string | null
           created_at?: string | null
           id?: string
           latitude: number
@@ -89,13 +97,12 @@ export type Database = {
           name: string
           opening_hours?: string | null
           phone?: string | null
-          updated_at?: string | null
           website?: string | null
         }
         Update: {
           accepted_crypto?: string[]
           address?: string
-          category?: string
+          category?: string | null
           created_at?: string | null
           id?: string
           latitude?: number
@@ -103,7 +110,6 @@ export type Database = {
           name?: string
           opening_hours?: string | null
           phone?: string | null
-          updated_at?: string | null
           website?: string | null
         }
         Relationships: []
@@ -116,8 +122,7 @@ export type Database = {
           id: string
           rejection_reason: string | null
           status: string
-          updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
@@ -126,8 +131,7 @@ export type Database = {
           id?: string
           rejection_reason?: string | null
           status?: string
-          updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string | null
@@ -136,8 +140,7 @@ export type Database = {
           id?: string
           rejection_reason?: string | null
           status?: string
-          updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
