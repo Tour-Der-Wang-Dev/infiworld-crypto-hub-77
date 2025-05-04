@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
@@ -80,13 +79,13 @@ export function AuthNavbar() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/profile" className="cursor-pointer flex items-center">
+                <Link to="/user-profile" className="cursor-pointer flex items-center">
                   <UserCircle className="mr-2 h-4 w-4" />
                   <span>โปรไฟล์</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/verify" className="cursor-pointer flex items-center">
+                <Link to="/identity-verification" className="cursor-pointer flex items-center">
                   <User className="mr-2 h-4 w-4" />
                   <span>ยืนยันตัวตน</span>
                 </Link>

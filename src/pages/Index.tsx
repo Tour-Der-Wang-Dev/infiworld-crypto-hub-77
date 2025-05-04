@@ -1,8 +1,9 @@
 
 import { Link } from "react-router-dom";
-import Navbar from "@/components/layout/Navbar";
+import { AuthNavbar } from "@/components/layout/AuthNavbar";
 import Footer from "@/components/layout/Footer";
 import ServiceCard from "@/components/home/ServiceCard";
+import { Helmet } from "react-helmet";
 
 const Index = () => {
   const services = [
@@ -10,37 +11,44 @@ const Index = () => {
       icon: "https://placehold.co/200?text=👨‍💻",
       title: "Freelance",
       description: "จ้างฟรีแลนซ์มืออาชีพในทุกสาขา ได้งานมีคุณภาพ ชำระเงินง่ายด้วยคริปโต",
-      link: "/freelance"
+      link: "/freelance-services"
     },
     {
       icon: "https://placehold.co/200?text=🏠",
       title: "Marketplace",
       description: "ซื้อ ขาย เช่า รถและอสังหาริมทรัพย์ ปลอดภัย มั่นใจ ด้วยระบบ Smart Contract",
-      link: "/marketplace"
+      link: "/buy-sell-marketplace"
     },
     {
       icon: "https://placehold.co/200?text=✈️",
       title: "Reservations",
       description: "จองตั๋วเครื่องบินและโรงแรมทั่วโลก ราคาพิเศษเมื่อชำระด้วยคริปโต",
-      link: "/reservations"
+      link: "/travel-reservations"
     },
     {
       icon: "https://placehold.co/200?text=🗺️",
       title: "Map",
       description: "ค้นหาร้านค้าที่รับชำระด้วยคริปโตใกล้คุณ ง่ายและสะดวก",
-      link: "/map"
+      link: "/crypto-store-map"
     },
     {
       icon: "https://placehold.co/200?text=🔐",
       title: "Verify",
       description: "ตรวจสอบและยืนยันตัวตนด้วยระบบที่ปลอดภัย รองรับ KYC/AML",
-      link: "/verify"
+      link: "/identity-verification"
     }
   ];
 
   return (
     <>
-      <Navbar />
+      <Helmet>
+        <title>INFIWORLD - ซื้อ ขาย เช่า จอง ด้วยคริปโตและบัตร</title>
+        <meta name="description" content="แพลตฟอร์มครบวงจรที่รองรับการซื้อขายด้วยเงินสด บัตรเครดิต และคริปโตเคอเรนซี" />
+        <meta name="keywords" content="คริปโต, บล็อกเชน, ฟรีแลนซ์, อสังหาริมทรัพย์, จองตั๋วเครื่องบิน, marketplace, เงินดิจิทัล" />
+        <link rel="canonical" href={window.location.origin + "/"} />
+      </Helmet>
+
+      <AuthNavbar />
       <main>
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-infi-dark to-infi-green text-white py-20 md:py-32">
@@ -54,7 +62,7 @@ const Index = () => {
                   แพลตฟอร์มครบวงจรที่รองรับการซื้อขายด้วยเงินสด บัตรเครดิต และคริปโตเคอเรนซี เพื่อตอบโจทย์ทุกความต้องการในโลกดิจิตอล
                 </p>
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link to="/freelance" className="btn-primary text-center">
+                  <Link to="/freelance-services" className="btn-primary text-center">
                     เริ่มต้นใช้งาน
                   </Link>
                   <a href="#services" className="btn-secondary text-center">
@@ -192,12 +200,12 @@ const Index = () => {
               สมัครสมาชิกฟรีวันนี้ และเริ่มต้นใช้งานบริการครบวงจรของ INFIWORLD
             </p>
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <Link to="/register" className="btn-primary bg-white text-infi-green hover:bg-gray-100">
+              <Link to="/auth" className="btn-primary bg-white text-infi-green hover:bg-gray-100">
                 สมัครสมาชิก
               </Link>
-              <Link to="#services" className="btn-secondary border-white text-white hover:bg-white hover:text-infi-green">
+              <a href="#services" className="btn-secondary border-white text-white hover:bg-white hover:text-infi-green">
                 ดูบริการเพิ่มเติม
-              </Link>
+              </a>
             </div>
           </div>
         </section>

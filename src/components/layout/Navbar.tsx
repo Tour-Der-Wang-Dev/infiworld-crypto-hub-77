@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -87,11 +88,11 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link to="/freelance" className="text-infi-dark hover:text-infi-green transition-colors">Freelance</Link>
-          <Link to="/marketplace" className="text-infi-dark hover:text-infi-green transition-colors">Marketplace</Link>
-          <Link to="/reservations" className="text-infi-dark hover:text-infi-green transition-colors">Reservations</Link>
-          <Link to="/map" className="text-infi-dark hover:text-infi-green transition-colors">Map</Link>
-          <Link to="/verify" className="text-infi-dark hover:text-infi-green transition-colors">Verify</Link>
+          <Link to="/freelance-services" className="text-infi-dark hover:text-infi-green transition-colors">Freelance</Link>
+          <Link to="/buy-sell-marketplace" className="text-infi-dark hover:text-infi-green transition-colors">Marketplace</Link>
+          <Link to="/travel-reservations" className="text-infi-dark hover:text-infi-green transition-colors">Reservations</Link>
+          <Link to="/crypto-store-map" className="text-infi-dark hover:text-infi-green transition-colors">Map</Link>
+          <Link to="/identity-verification" className="text-infi-dark hover:text-infi-green transition-colors">Verify</Link>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm">EN | TH</Button>
             {user ? (
@@ -118,11 +119,11 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200 py-2">
           <div className="container mx-auto px-4 flex flex-col space-y-3">
-            <Link to="/freelance" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Freelance</Link>
-            <Link to="/marketplace" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Marketplace</Link>
-            <Link to="/reservations" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Reservations</Link>
-            <Link to="/map" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Map</Link>
-            <Link to="/verify" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Verify</Link>
+            <Link to="/freelance-services" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Freelance</Link>
+            <Link to="/buy-sell-marketplace" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Marketplace</Link>
+            <Link to="/travel-reservations" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Reservations</Link>
+            <Link to="/crypto-store-map" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Map</Link>
+            <Link to="/identity-verification" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Verify</Link>
             <div className="flex flex-col space-y-2 pt-2">
               <Button variant="outline" size="sm" className="w-full justify-center">EN | TH</Button>
               {user ? (
