@@ -1,15 +1,60 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/sonner";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState(null);
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
+
+  // Check if user is logged in
+  useState(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      setUser(data.session?.user || null);
+    };
+
+    getUser();
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  });
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = async () => {
+    try {
+      setIsLoading(true);
+      await supabase.auth.signOut();
+      toast({
+        title: "ออกจากระบบสำเร็จ",
+        description: "คุณได้ออกจากระบบแล้ว",
+      });
+      navigate('/');
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถออกจากระบบได้ กรุณาลองใหม่อีกครั้ง",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -51,7 +96,22 @@ const Navbar = () => {
           <Link to="/verify" className="text-infi-dark hover:text-infi-green transition-colors">Verify</Link>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm">EN | TH</Button>
-            <Button className="bg-infi-green hover:bg-infi-green-hover">เข้าสู่ระบบ</Button>
+            {user ? (
+              <Button 
+                onClick={handleLogout} 
+                className="bg-infi-green hover:bg-infi-green-hover"
+                disabled={isLoading}
+              >
+                {isLoading ? "กำลังออกจากระบบ..." : "ออกจากระบบ"}
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => navigate('/auth')} 
+                className="bg-infi-green hover:bg-infi-green-hover"
+              >
+                เข้าสู่ระบบ
+              </Button>
+            )}
           </div>
         </div>
       </nav>
@@ -67,7 +127,22 @@ const Navbar = () => {
             <Link to="/verify" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Verify</Link>
             <div className="flex flex-col space-y-2 pt-2">
               <Button variant="outline" size="sm" className="w-full justify-center">EN | TH</Button>
-              <Button className="w-full bg-infi-green hover:bg-infi-green-hover">เข้าสู่ระบบ</Button>
+              {user ? (
+                <Button 
+                  onClick={handleLogout} 
+                  className="w-full bg-infi-green hover:bg-infi-green-hover"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "กำลังออกจากระบบ..." : "ออกจากระบบ"}
+                </Button>
+              ) : (
+                <Button 
+                  onClick={() => navigate('/auth')} 
+                  className="w-full bg-infi-green hover:bg-infi-green-hover"
+                >
+                  เข้าสู่ระบบ
+                </Button>
+              )}
             </div>
           </div>
         </div>
