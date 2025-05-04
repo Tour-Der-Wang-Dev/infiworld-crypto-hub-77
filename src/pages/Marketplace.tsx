@@ -1,11 +1,11 @@
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ListingCard from "@/components/marketplace/ListingCard";
 import FilterSidebar from "@/components/marketplace/FilterSidebar";
-import { listings } from "@/data/marketplace";
+import { supabase } from "@/integrations/supabase/client";
 
 type ListingType = "all" | "car" | "property";
 type PriceRange = "all" | "low" | "medium" | "high";
@@ -16,43 +16,148 @@ interface Listing {
   description: string;
   price: number;
   type: "car" | "property";
-  image: string;
-  isRental: boolean;
+  images: string[];
+  is_rental: boolean;
   location: string;
   features: string[];
+  status: string;
 }
 
 const Marketplace = () => {
   const [listingType, setListingType] = useState<ListingType>("all");
   const [priceRange, setPriceRange] = useState<PriceRange>("all");
   const [isRental, setIsRental] = useState<boolean | null>(null);
-  const [filteredListings, setFilteredListings] = useState<Listing[]>(listings as Listing[]);
+  const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { toast } = useToast();
 
-  // Filter listings based on selected filters
-  useEffect(() => {
-    let results = [...listings] as Listing[];
+  // Fetch listings from Supabase
+  const fetchListings = async () => {
+    setIsLoading(true);
+    try {
+      let query = supabase
+        .from('listings')
+        .select('*')
+        .eq('status', 'active');
+      
+      // Apply filters
+      if (listingType !== "all") {
+        query = query.eq('type', listingType);
+      }
+      
+      if (priceRange !== "all") {
+        if (priceRange === "low") query = query.lt('price', 500000);
+        else if (priceRange === "medium") query = query.gte('price', 500000).lt('price', 2000000);
+        else if (priceRange === "high") query = query.gte('price', 2000000);
+      }
+      
+      if (isRental !== null) {
+        query = query.eq('is_rental', isRental);
+      }
 
-    // Filter by listing type
-    if (listingType !== "all") {
-      results = results.filter((item) => item.type === listingType);
+      const { data, error } = await query;
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        // Transform features from JSONB to string array
+        const formattedListings = data.map((listing) => ({
+          ...listing,
+          features: Array.isArray(listing.features) ? listing.features : Object.keys(listing.features || {}),
+          // Use first image from array or fallback to placeholder
+          image: listing.images && listing.images.length > 0 ? listing.images[0] : "/placeholder.svg"
+        }));
+        setFilteredListings(formattedListings);
+      }
+    } catch (error) {
+      console.error('Error fetching listings:', error);
+      toast({
+        title: "Error fetching listings",
+        description: "Please try again later",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    // Filter by price range
-    if (priceRange !== "all") {
-      results = results.filter((item) => {
-        if (priceRange === "low") return item.price < 500000;
-        if (priceRange === "medium") return item.price >= 500000 && item.price < 2000000;
-        if (priceRange === "high") return item.price >= 2000000;
-        return true;
+  // Track listing view
+  const trackListingView = async (listingId: string) => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const userId = sessionData?.session?.user?.id;
+    
+    if (userId && listingId) {
+      await supabase.from('listing_views').insert({
+        listing_id: listingId,
+        viewer_id: userId
+      }).select();
+    }
+  };
+
+  // Add to favorites
+  const toggleFavorite = async (listingId: string) => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const userId = sessionData?.session?.user?.id;
+    
+    if (!userId) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save listings to favorites",
+        variant: "default",
+      });
+      return;
+    }
+    
+    try {
+      // Check if listing is already in favorites
+      const { data: existingFavorite } = await supabase
+        .from('favorites')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('listing_id', listingId)
+        .single();
+        
+      if (existingFavorite) {
+        // Remove from favorites
+        await supabase
+          .from('favorites')
+          .delete()
+          .eq('id', existingFavorite.id);
+          
+        toast({
+          title: "Removed from favorites",
+          description: "The listing has been removed from your favorites",
+          variant: "default",
+        });
+      } else {
+        // Add to favorites
+        await supabase
+          .from('favorites')
+          .insert({
+            user_id: userId,
+            listing_id: listingId
+          });
+          
+        toast({
+          title: "Added to favorites",
+          description: "The listing has been added to your favorites",
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast({
+        title: "Error updating favorites",
+        description: "Please try again later",
+        variant: "destructive",
       });
     }
+  };
 
-    // Filter by rental status
-    if (isRental !== null) {
-      results = results.filter((item) => item.isRental === isRental);
-    }
-
-    setFilteredListings(results);
+  useEffect(() => {
+    fetchListings();
   }, [listingType, priceRange, isRental]);
 
   return (
@@ -80,10 +185,19 @@ const Marketplace = () => {
 
             {/* Listings Grid */}
             <div className="w-full md:w-3/4">
-              {filteredListings.length > 0 ? (
+              {isLoading ? (
+                <div className="flex justify-center items-center h-60">
+                  <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-infi-green"></div>
+                </div>
+              ) : filteredListings.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredListings.map((listing) => (
-                    <ListingCard key={listing.id} listing={listing} />
+                    <ListingCard 
+                      key={listing.id} 
+                      listing={listing} 
+                      onView={() => trackListingView(listing.id)}
+                      onFavoriteToggle={() => toggleFavorite(listing.id)}
+                    />
                   ))}
                 </div>
               ) : (
