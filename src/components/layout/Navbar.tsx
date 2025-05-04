@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,7 +13,15 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   // Check if user is logged in
-  useState(() => {
+  useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    // THEN check for existing session
     const getUser = async () => {
       const { data } = await supabase.auth.getSession();
       setUser(data.session?.user || null);
@@ -21,15 +29,9 @@ const Navbar = () => {
 
     getUser();
 
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user || null);
-      }
-    );
-
+    // Clean up subscription
     return () => subscription.unsubscribe();
-  });
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -47,7 +49,6 @@ const Navbar = () => {
       console.error("Logout error:", error);
       toast("เกิดข้อผิดพลาด", {
         description: "ไม่สามารถออกจากระบบได้ กรุณาลองใหม่อีกครั้ง",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

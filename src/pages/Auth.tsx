@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -49,23 +49,24 @@ const Auth = () => {
 
   // Check if user is already logged in
   useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session) {
+          navigate('/', { replace: true });
+        }
+      }
+    );
+
+    // THEN check for existing session
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        navigate('/');
+        navigate('/', { replace: true });
       }
     };
     
     checkSession();
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session) {
-          navigate('/');
-        }
-      }
-    );
 
     return () => subscription.unsubscribe();
   }, [navigate]);
@@ -81,15 +82,15 @@ const Auth = () => {
     },
   });
 
-  // Handle form submission
+  // Handle form submission with proper error sanitization
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
 
       if (isLoginView) {
-        // Login
+        // Login with sanitized inputs
         const { error } = await supabase.auth.signInWithPassword({
-          email: data.email,
+          email: data.email.trim(),
           password: data.password,
         });
 
@@ -100,9 +101,9 @@ const Auth = () => {
         });
 
       } else {
-        // Sign up
+        // Sign up with sanitized inputs
         const { error } = await supabase.auth.signUp({
-          email: data.email,
+          email: data.email.trim(),
           password: data.password,
           options: {
             data: {
@@ -118,11 +119,17 @@ const Auth = () => {
         });
       }
     } catch (error: any) {
-      toast("เกิดข้อผิดพลาด", {
-        description: isLoginView ? 'เข้าสู่ระบบล้มเหลว' : 'การลงทะเบียนล้มเหลว' + ': ' + (error.message || 'กรุณาลองใหม่อีกครั้ง'),
-        variant: "destructive"
-      });
+      // Handle error without exposing sensitive details
       console.error('Authentication error:', error);
+      
+      // Display sanitized error message
+      const errorMessage = isLoginView ? 
+        'เข้าสู่ระบบล้มเหลว' : 
+        'การลงทะเบียนล้มเหลว';
+        
+      toast("เกิดข้อผิดพลาด", {
+        description: errorMessage + ': กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง'
+      });
     } finally {
       setIsLoading(false);
     }
