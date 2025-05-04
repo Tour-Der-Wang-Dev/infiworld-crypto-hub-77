@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/use-auth";
+import { RequireAuth } from "@/components/auth/RequireAuth";
 
 // Pages
 import Index from "./pages/Index";
@@ -34,11 +35,11 @@ const App = () => (
           <div className="flex flex-col min-h-screen">
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/freelance" element={<Freelance />} />
+              <Route path="/freelance" element={<RequireAuth><Freelance /></RequireAuth>} />
               <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/reservations" element={<Reservations />} />
+              <Route path="/reservations" element={<RequireAuth><Reservations /></RequireAuth>} />
               <Route path="/map" element={<Map />} />
-              <Route path="/verify" element={<Verification />} />
+              <Route path="/verify" element={<RequireAuth><Verification /></RequireAuth>} />
               <Route path="/auth" element={<Auth />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
