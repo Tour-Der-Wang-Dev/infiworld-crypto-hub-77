@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import ListingCard from "@/components/marketplace/ListingCard";
 import FilterSidebar from "@/components/marketplace/FilterSidebar";
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 
 type ListingType = "all" | "car" | "property";
 type PriceRange = "all" | "low" | "medium" | "high";
@@ -62,13 +63,23 @@ const Marketplace = () => {
       }
 
       if (data) {
-        // Transform features from JSONB to string array
+        // Transform features from JSONB to string array and ensure type safety
         const formattedListings = data.map((listing) => ({
           ...listing,
-          features: Array.isArray(listing.features) ? listing.features : Object.keys(listing.features || {}),
-          // Use first image from array or fallback to placeholder
-          image: listing.images && listing.images.length > 0 ? listing.images[0] : "/placeholder.svg"
-        }));
+          // Ensure type is either "car" or "property"
+          type: (listing.type === "car" || listing.type === "property") ? listing.type : "property" as const,
+          // Convert features to string array
+          features: Array.isArray(listing.features) 
+            ? listing.features as string[] 
+            : (typeof listing.features === 'object' && listing.features !== null) 
+              ? Object.keys(listing.features as Record<string, unknown>) 
+              : [],
+          // Ensure images is an array
+          images: Array.isArray(listing.images) ? listing.images : [],
+          // Ensure is_rental is boolean
+          is_rental: Boolean(listing.is_rental)
+        })) as Listing[];
+        
         setFilteredListings(formattedListings);
       }
     } catch (error) {

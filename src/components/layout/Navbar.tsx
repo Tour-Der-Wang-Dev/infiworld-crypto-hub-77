@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -40,15 +39,13 @@ const Navbar = () => {
     try {
       setIsLoading(true);
       await supabase.auth.signOut();
-      toast({
-        title: "ออกจากระบบสำเร็จ",
+      toast("ออกจากระบบสำเร็จ", {
         description: "คุณได้ออกจากระบบแล้ว",
       });
       navigate('/');
     } catch (error) {
       console.error("Logout error:", error);
-      toast({
-        title: "เกิดข้อผิดพลาด",
+      toast("เกิดข้อผิดพลาด", {
         description: "ไม่สามารถออกจากระบบได้ กรุณาลองใหม่อีกครั้ง",
         variant: "destructive",
       });

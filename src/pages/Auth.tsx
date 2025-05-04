@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -96,9 +95,8 @@ const Auth = () => {
 
         if (error) throw error;
 
-        toast({
-          title: 'เข้าสู่ระบบสำเร็จ',
-          description: 'ยินดีต้อนรับกลับมา',
+        toast("เข้าสู่ระบบสำเร็จ", {
+          description: "ยินดีต้อนรับกลับมา"
         });
 
       } else {
@@ -115,16 +113,14 @@ const Auth = () => {
 
         if (error) throw error;
 
-        toast({
-          title: 'ลงทะเบียนสำเร็จ',
-          description: 'กรุณาตรวจสอบอีเมลเพื่อยืนยันตัวตน',
+        toast("ลงทะเบียนสำเร็จ", {
+          description: "กรุณาตรวจสอบอีเมลเพื่อยืนยันตัวตน"
         });
       }
     } catch (error: any) {
-      toast({
-        title: isLoginView ? 'เข้าสู่ระบบล้มเหลว' : 'การลงทะเบียนล้มเหลว',
-        description: error.message || 'กรุณาลองใหม่อีกครั้ง',
-        variant: 'destructive',
+      toast("เกิดข้อผิดพลาด", {
+        description: isLoginView ? 'เข้าสู่ระบบล้มเหลว' : 'การลงทะเบียนล้มเหลว' + ': ' + (error.message || 'กรุณาลองใหม่อีกครั้ง'),
+        variant: "destructive"
       });
       console.error('Authentication error:', error);
     } finally {
