@@ -15,6 +15,7 @@ import Reservations from "./pages/Reservations";
 import Map from "./pages/Map";
 import Verification from "./pages/Verification";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/map" element={<Map />} />
               <Route path="/verify" element={<RequireAuth><Verification /></RequireAuth>} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -22,6 +23,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/layout/Navbar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/hooks/use-auth';
 
 // Form schema for validation
 const formSchema = z.object({
@@ -41,35 +43,26 @@ type FormData = z.infer<typeof formSchema>;
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoginView, setIsLoginView] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
   const { toast: hookToast } = useToast();
+  const { user } = useAuth();
+
+  // Get the intended destination from the location state, or default to "/"
+  const from = location.state?.from?.pathname || "/";
 
   // Check if user is already logged in
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session) {
-          navigate('/', { replace: true });
-        }
-      }
-    );
-
-    // THEN check for existing session
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        navigate('/', { replace: true });
-      }
-    };
-    
-    checkSession();
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    if (user) {
+      toast("คุณได้เข้าสู่ระบบแล้ว", {
+        description: "กำลังนำคุณไปยังหน้าหลัก"
+      });
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, from]);
 
   // Form setup
   const form = useForm<FormData>({
@@ -100,6 +93,9 @@ const Auth = () => {
           description: "ยินดีต้อนรับกลับมา"
         });
 
+        // Navigate to the intended destination after login
+        navigate(from, { replace: true });
+
       } else {
         // Sign up with sanitized inputs
         const { error } = await supabase.auth.signUp({
@@ -117,6 +113,8 @@ const Auth = () => {
         toast("ลงทะเบียนสำเร็จ", {
           description: "กรุณาตรวจสอบอีเมลเพื่อยืนยันตัวตน"
         });
+
+        // Stay on login screen after signup, with a friendly message shown via toast
       }
     } catch (error: any) {
       // Handle error without exposing sensitive details
@@ -143,6 +141,34 @@ const Auth = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  // If already logged in, show a different view
+  if (user) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">คุณได้เข้าสู่ระบบแล้ว</h1>
+            <p className="mb-6">คุณเข้าสู่ระบบแล้วด้วยอีเมล {user.email}</p>
+            <div className="flex flex-col space-y-4">
+              <Button onClick={() => navigate('/profile')} className="bg-infi-green hover:bg-infi-green-hover">
+                ไปยังโปรไฟล์ของฉัน
+              </Button>
+              <Button onClick={() => navigate('/')} variant="outline">
+                ไปยังหน้าหลัก
+              </Button>
+            </div>
+          </div>
+        </div>
+        <footer className="bg-white border-t py-4">
+          <div className="container mx-auto px-4 text-center text-sm text-infi-gray">
+            <p>© {new Date().getFullYear()} INFIWORLD.COM - แพลตฟอร์มที่รวมบริการซื้อ-ขาย-เช่า, งานฟรีแลนซ์, การจอง, และแผนที่ร้านค้าที่รับคริปโต</p>
+          </div>
+        </footer>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
