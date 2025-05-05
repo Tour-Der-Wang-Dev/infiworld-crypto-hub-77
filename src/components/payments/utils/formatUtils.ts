@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { PaymentType } from "@/components/payments/types";
+import React from "react"; // Add React import for JSX
 
 export const formatDate = (dateString: string): string => {
   try {
@@ -21,7 +22,8 @@ export const formatAmount = (amount: number, currency: string = "THB"): string =
   }).format(amount);
 };
 
-export const getPaymentStatusBadge = (status: string) => {
+// Must use arrow function with JSX return type
+export const getPaymentStatusBadge = (status: string): React.ReactNode => {
   switch (status) {
     case 'completed':
       return <Badge className="bg-green-500">สำเร็จ</Badge>;

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { AuthNavbar } from "@/components/layout/AuthNavbar";
 import Footer from "@/components/layout/Footer";
 import ServiceCard from "@/components/home/ServiceCard";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 const Index = () => {
   const services = [
