@@ -1,23 +1,11 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PaymentMethods } from "@/components/payments/PaymentMethods";
-import { PaymentType } from "@/components/payments/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-
-interface PaymentModalProps {
-  open: boolean;
-  onClose: () => void;
-  amount: number;
-  currency?: string;
-  paymentType: PaymentType;
-  relatedId: string;
-  onSuccess?: (paymentId: string) => void;
-  useEscrow?: boolean;
-  sellerId?: string;
-}
+import { PaymentModalProps } from "@/components/payments/types";
 
 export function PaymentModal({
   open,

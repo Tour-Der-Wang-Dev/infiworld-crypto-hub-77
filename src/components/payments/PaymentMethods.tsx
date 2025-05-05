@@ -7,16 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PaymentConsent } from "@/components/payments/PaymentConsent";
 import { CreditCard, Bitcoin, QrCode } from "lucide-react";
-import { PaymentType } from "@/components/payments/types";
-
-interface PaymentMethodsProps {
-  amount: number;
-  currency?: string;
-  onPaymentSubmit: (method: string) => Promise<void>;
-  onCancel: () => void;
-  isProcessing: boolean;
-  paymentType: PaymentType;
-}
+import { formatAmount, getPaymentTitle } from "@/components/payments/utils/formatUtils";
+import { PaymentMethodsProps } from "@/components/payments/types";
 
 export function PaymentMethods({
   amount,
@@ -48,35 +40,14 @@ export function PaymentMethods({
     await onPaymentSubmit(selectedMethod);
   };
 
-  const formatAmount = (amount: number): string => {
-    return new Intl.NumberFormat('th-TH', { 
-      style: 'currency', 
-      currency: currency,
-      minimumFractionDigits: 2
-    }).format(amount);
-  };
-
-  const getPaymentTitle = (): string => {
-    switch(paymentType) {
-      case 'marketplace':
-        return 'ชำระเงินสำหรับ Marketplace';
-      case 'freelance':
-        return 'ชำระเงินสำหรับบริการฟรีแลนซ์';
-      case 'reservation':
-        return 'ชำระเงินสำหรับการจอง';
-      default:
-        return 'ชำระเงิน';
-    }
-  };
-
   return (
     <Card className="w-[400px] max-w-full mx-auto">
       <CardHeader>
-        <CardTitle>{getPaymentTitle()}</CardTitle>
+        <CardTitle>{getPaymentTitle(paymentType)}</CardTitle>
         <CardDescription>
           เลือกวิธีการชำระเงินที่คุณต้องการ
         </CardDescription>
-        <div className="mt-2 text-xl font-bold">{formatAmount(amount)}</div>
+        <div className="mt-2 text-xl font-bold">{formatAmount(amount, currency)}</div>
       </CardHeader>
       <CardContent>
         <PaymentConsent onConsentChange={setHasConsent} />
@@ -156,7 +127,7 @@ export function PaymentMethods({
                 <Bitcoin className="h-16 w-16 text-gray-500" />
               </div>
               <p className="text-sm text-muted-foreground">
-                สแกน QR Code ด้วยแอพคริปโตของคุณเพื่อชำระเงิน {formatAmount(amount)}
+                สแกน QR Code ด้วยแอพคริปโตของคุณเพื่อชำระเงิน {formatAmount(amount, currency)}
               </p>
             </div>
           </TabsContent>
@@ -167,7 +138,7 @@ export function PaymentMethods({
                 <QrCode className="h-16 w-16 text-gray-500" />
               </div>
               <p className="text-sm text-muted-foreground">
-                สแกน QR Code ด้วยแอพธนาคารหรือแอพมือถือเพื่อชำระเงิน {formatAmount(amount)}
+                สแกน QR Code ด้วยแอพธนาคารหรือแอพมือถือเพื่อชำระเงิน {formatAmount(amount, currency)}
               </p>
             </div>
           </TabsContent>

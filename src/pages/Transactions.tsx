@@ -4,12 +4,15 @@ import { TransactionsList } from "@/components/payments/TransactionsList";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CanonicalTag } from "@/App";
+import { Helmet } from "react-helmet-async";
 
 const Transactions = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <CanonicalTag path="/my-transactions" />
+      <Helmet>
+        <title>My Transactions | INFIWORLD</title>
+        <link rel="canonical" href="/my-transactions" />
+      </Helmet>
       <AuthNavbar />
       
       <main className="container mx-auto p-4 py-8">
