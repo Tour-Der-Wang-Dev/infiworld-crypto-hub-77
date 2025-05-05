@@ -105,6 +105,56 @@ export const usePaymentData = ({
     }
   }, [user, fetchTransactions]);
   
+  /**
+   * Handle releasing escrow funds for a transaction
+   */
+  const handleReleaseEscrow = useCallback(async (transactionId: string) => {
+    if (!user) return;
+    
+    try {
+      toast.loading("กำลังดำเนินการปล่อยเงิน Escrow...");
+      
+      // Get the escrow transaction first
+      const { data: paymentData, error: paymentError } = await supabase
+        .from("payments")
+        .select("escrow_transactions(*)")
+        .eq("id", transactionId)
+        .single();
+      
+      if (paymentError) throw paymentError;
+      if (!paymentData?.escrow_transactions?.length) {
+        throw new Error("ไม่พบข้อมูล Escrow สำหรับธุรกรรมนี้");
+      }
+      
+      const escrowId = paymentData.escrow_transactions[0].id;
+      
+      // Update escrow status
+      const { error: escrowError } = await supabase
+        .from("escrow_transactions")
+        .update({
+          escrow_status: "released",
+          release_date: new Date().toISOString()
+        })
+        .eq("id", escrowId);
+        
+      if (escrowError) throw escrowError;
+      
+      toast.dismiss();
+      toast.success("ปล่อยเงิน Escrow เรียบร้อยแล้ว", {
+        description: "เงินได้ถูกโอนให้ผู้ขายเรียบร้อยแล้ว"
+      });
+      
+      // Refresh transactions list
+      await fetchTransactions();
+    } catch (error: any) {
+      toast.dismiss();
+      console.error("Error releasing escrow:", error);
+      toast.error("ไม่สามารถปล่อยเงิน Escrow ได้", {
+        description: error.message || "กรุณาลองใหม่อีกครั้ง"
+      });
+    }
+  }, [user, fetchTransactions]);
+  
   // Load transactions on first render
   useEffect(() => {
     if (user) {
@@ -118,6 +168,7 @@ export const usePaymentData = ({
     error,
     fetchTransactions,
     handleRequestRefund,
+    handleReleaseEscrow,
     canRequestRefund,
     canReleaseEscrow: (transaction: Transaction) => canReleaseEscrow(transaction, user?.id),
     user

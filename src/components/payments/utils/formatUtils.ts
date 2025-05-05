@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { PaymentType } from "@/components/payments/types";
-import * as React from "react"; // Using * as React import pattern
+import * as React from "react";
 
 export const formatDate = (dateString: string): string => {
   try {
@@ -12,6 +12,14 @@ export const formatDate = (dateString: string): string => {
   } catch (error) {
     return dateString;
   }
+};
+
+export const formatCurrency = (amount: number, currency: string = "THB"): string => {
+  return new Intl.NumberFormat('th-TH', { 
+    style: 'currency', 
+    currency: currency,
+    minimumFractionDigits: 2
+  }).format(amount);
 };
 
 export const formatAmount = (amount: number, currency: string = "THB"): string => {
