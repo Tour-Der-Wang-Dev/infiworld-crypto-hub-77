@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { PaymentType } from "@/components/payments/types";
-import React from "react"; // Add React import for JSX
+import * as React from "react"; // Using * as React import pattern
 
 export const formatDate = (dateString: string): string => {
   try {
@@ -22,17 +22,17 @@ export const formatAmount = (amount: number, currency: string = "THB"): string =
   }).format(amount);
 };
 
-// Must use arrow function with JSX return type
-export const getPaymentStatusBadge = (status: string): React.ReactNode => {
+// Create Badge elements without JSX to avoid syntax errors
+export const getPaymentStatusBadge = (status: string): React.ReactElement => {
   switch (status) {
     case 'completed':
-      return <Badge className="bg-green-500">สำเร็จ</Badge>;
+      return React.createElement(Badge, { className: "bg-green-500" }, "สำเร็จ");
     case 'pending':
-      return <Badge variant="outline" className="text-amber-600 border-amber-600">รอดำเนินการ</Badge>;
+      return React.createElement(Badge, { variant: "outline", className: "text-amber-600 border-amber-600" }, "รอดำเนินการ");
     case 'failed':
-      return <Badge variant="destructive">ล้มเหลว</Badge>;
+      return React.createElement(Badge, { variant: "destructive" }, "ล้มเหลว");
     default:
-      return <Badge variant="secondary">{status}</Badge>;
+      return React.createElement(Badge, { variant: "secondary" }, status);
   }
 };
 
