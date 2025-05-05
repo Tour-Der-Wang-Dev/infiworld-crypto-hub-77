@@ -24,6 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/layout/Navbar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/hooks/use-auth';
+import { Helmet } from 'react-helmet-async';
 
 // Form schema for validation
 const formSchema = z.object({
@@ -32,7 +33,12 @@ const formSchema = z.object({
   }),
   password: z.string().min(8, {
     message: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร',
-  }),
+  }).refine(
+    (password) => /[0-9]/.test(password) && /[a-zA-Z]/.test(password),
+    {
+      message: 'รหัสผ่านต้องมีทั้งตัวเลขและตัวอักษร',
+    }
+  ),
   rememberMe: z.boolean().optional(),
   pdpaConsent: z.boolean().refine((val) => val === true, {
     message: 'กรุณายอมรับนโยบายความเป็นส่วนตัว',
@@ -47,6 +53,8 @@ const Auth = () => {
   const [isLoginView, setIsLoginView] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
   const isMobile = useIsMobile();
   const { toast: hookToast } = useToast();
   const { user } = useAuth();
@@ -71,9 +79,14 @@ const Auth = () => {
       email: '',
       password: '',
       rememberMe: false,
-      pdpaConsent: false,
+      pdpaConsent: isLoginView ? undefined : false,
     },
   });
+
+  // Reset certain form fields when toggling views
+  useEffect(() => {
+    form.setValue('pdpaConsent', isLoginView ? undefined : false);
+  }, [isLoginView, form]);
 
   // Handle form submission with proper error sanitization
   const onSubmit = async (data: FormData) => {
@@ -142,17 +155,77 @@ const Auth = () => {
     setShowPassword(!showPassword);
   };
 
+  // Simulate sending OTP function
+  const sendOTP = async (email: string) => {
+    try {
+      setIsLoading(true);
+      // In a real implementation, this would call an API to send OTP
+      console.log("Sending OTP to:", email);
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setOtpSent(true);
+      toast("ส่งรหัส OTP แล้ว", {
+        description: "กรุณาตรวจสอบอีเมลของคุณ"
+      });
+    } catch (error) {
+      console.error("OTP sending error:", error);
+      toast("เกิดข้อผิดพลาด", {
+        description: "ไม่สามารถส่งรหัส OTP ได้ กรุณาลองใหม่อีกครั้ง"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle OTP verification
+  const verifyOTP = async () => {
+    try {
+      setIsLoading(true);
+      // In a real implementation, this would verify the OTP against an API
+      console.log("Verifying OTP:", otpCode);
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      if (otpCode === '123456') { // Demo only - in production we'd validate against API
+        toast("ยืนยันตัวตนสำเร็จ", {
+          description: "กำลังนำคุณไปยังหน้าหลัก"
+        });
+        setOtpSent(false);
+        navigate(from, { replace: true });
+      } else {
+        toast("เกิดข้อผิดพลาด", {
+          description: "รหัส OTP ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง"
+        });
+      }
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      toast("เกิดข้อผิดพลาด", {
+        description: "ไม่สามารถยืนยันรหัส OTP ได้ กรุณาลองใหม่อีกครั้ง"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // If already logged in, show a different view
   if (user) {
     return (
       <div className="min-h-screen flex flex-col">
+        <Helmet>
+          <title>เข้าสู่ระบบ - INFIWORLD | แพลตฟอร์มคริปโตครบวงจร</title>
+          <meta name="description" content="เข้าสู่ระบบเพื่อใช้งานบริการซื้อ-ขาย-เช่า, งานฟรีแลนซ์, การจอง, และแผนที่ร้านค้าที่รับคริปโตบน INFIWORLD" />
+          <meta name="keywords" content="INFIWORLD เข้าสู่ระบบ, คริปโตแพลตฟอร์ม, ฟรีแลนซ์, ซื้อขาย, จองบริการ, คริปโตเคอเรนซี" />
+        </Helmet>
         <Navbar />
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">คุณได้เข้าสู่ระบบแล้ว</h1>
             <p className="mb-6">คุณเข้าสู่ระบบแล้วด้วยอีเมล {user.email}</p>
             <div className="flex flex-col space-y-4">
-              <Button onClick={() => navigate('/profile')} className="bg-infi-green hover:bg-infi-green-hover">
+              <Button onClick={() => navigate('/user-profile')} className="bg-infi-green hover:bg-infi-green-hover">
                 ไปยังโปรไฟล์ของฉัน
               </Button>
               <Button onClick={() => navigate('/')} variant="outline">
@@ -161,7 +234,7 @@ const Auth = () => {
             </div>
           </div>
         </div>
-        <footer className="bg-white border-t py-4">
+        <footer className="bg-white border-t py-4" aria-label="footer">
           <div className="container mx-auto px-4 text-center text-sm text-infi-gray">
             <p>© {new Date().getFullYear()} INFIWORLD.COM - แพลตฟอร์มที่รวมบริการซื้อ-ขาย-เช่า, งานฟรีแลนซ์, การจอง, และแผนที่ร้านค้าที่รับคริปโต</p>
           </div>
@@ -170,8 +243,84 @@ const Auth = () => {
     );
   }
 
+  // OTP Verification View
+  if (otpSent) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Helmet>
+          <title>ยืนยันรหัส OTP - INFIWORLD | แพลตฟอร์มคริปโตครบวงจร</title>
+          <meta name="description" content="ยืนยันตัวตนด้วยรหัส OTP เพื่อความปลอดภัยในการใช้งาน INFIWORLD" />
+          <meta name="keywords" content="INFIWORLD, OTP, ยืนยันตัวตน, คริปโตแพลตฟอร์ม" />
+        </Helmet>
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full max-w-md">
+            <div className="mb-8 text-center">
+              <h1 className="text-2xl font-bold">ยืนยันรหัส OTP</h1>
+              <p className="text-infi-gray mt-2">
+                กรุณาใส่รหัส OTP ที่ส่งไปยังอีเมลของคุณ
+              </p>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="flex flex-col space-y-2">
+                <label htmlFor="otp" className="font-medium">รหัส OTP</label>
+                <Input
+                  id="otp"
+                  type="text"
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                  placeholder="กรอกรหัส OTP 6 หลัก"
+                  className="text-center text-lg tracking-widest"
+                  maxLength={6}
+                />
+              </div>
+              
+              <Button
+                onClick={verifyOTP}
+                className="w-full bg-infi-green hover:bg-infi-green-hover transition-transform hover:scale-[1.02]"
+                disabled={isLoading || otpCode.length !== 6}
+                aria-label="ยืนยันรหัส OTP"
+              >
+                {isLoading ? 'กำลังตรวจสอบ...' : 'ยืนยันรหัส OTP'}
+              </Button>
+              
+              <p className="text-center text-sm">
+                ยังไม่ได้รับรหัส?{' '}
+                <button
+                  type="button"
+                  onClick={() => sendOTP(form.getValues('email'))}
+                  className="text-infi-green hover:underline"
+                  disabled={isLoading}
+                >
+                  ส่งรหัสใหม่
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <footer className="bg-white border-t py-4" aria-label="footer">
+          <div className="container mx-auto px-4 text-center text-sm text-infi-gray">
+            <p>© {new Date().getFullYear()} INFIWORLD.COM - แพลตฟอร์มที่รวมบริการซื้อ-ขาย-เช่า, งานฟรีแลนซ์, การจอง, และแผนที่ร้านค้าที่รับคริปโต</p>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
+  // Main Auth View (Login/Signup)
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>{isLoginView ? "เข้าสู่ระบบ" : "สมัครสมาชิก"} - INFIWORLD | แพลตฟอร์มคริปโตครบวงจร</title>
+        <meta name="description" content={isLoginView ? 
+          "เข้าสู่ระบบเพื่อใช้งานบริการซื้อ-ขาย-เช่า, งานฟรีแลนซ์, การจอง, และแผนที่ร้านค้าที่รับคริปโตบน INFIWORLD" :
+          "สมัครสมาชิกฟรีเพื่อเข้าถึงบริการซื้อ-ขาย-เช่า, งานฟรีแลนซ์, การจอง, และแผนที่ร้านค้าที่รับคริปโตบน INFIWORLD"} 
+        />
+        <meta name="keywords" content="INFIWORLD เข้าสู่ระบบ, คริปโตแพลตฟอร์ม, ฟรีแลนซ์, ซื้อขาย, จองบริการ, คริปโตเคอเรนซี" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" />
+      </Helmet>
       <Navbar />
       <div className="flex-1 flex flex-col md:flex-row">
         {/* Image Section */}
@@ -219,7 +368,7 @@ const Auth = () => {
             </div>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" aria-label={isLoginView ? "ฟอร์มเข้าสู่ระบบ" : "ฟอร์มสมัครสมาชิก"}>
                 <FormField
                   control={form.control}
                   name="email"
@@ -234,8 +383,10 @@ const Auth = () => {
                             type="email"
                             {...field}
                             className="pr-10"
+                            aria-required="true"
+                            aria-invalid={!!form.formState.errors.email}
                           />
-                          <Mail className="absolute right-3 top-3 text-gray-400 h-4 w-4" />
+                          <Mail className="absolute right-3 top-3 text-gray-400 h-4 w-4" aria-hidden="true" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -257,6 +408,8 @@ const Auth = () => {
                             autoComplete={isLoginView ? "current-password" : "new-password"}
                             {...field}
                             className="pr-10"
+                            aria-required="true"
+                            aria-invalid={!!form.formState.errors.password}
                           />
                           <button
                             type="button"
@@ -265,9 +418,9 @@ const Auth = () => {
                             aria-label={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
                           >
                             {showPassword ? (
-                              <EyeOff className="h-4 w-4" />
+                              <EyeOff className="h-4 w-4" aria-hidden="true" />
                             ) : (
-                              <Eye className="h-4 w-4" />
+                              <Eye className="h-4 w-4" aria-hidden="true" />
                             )}
                           </button>
                         </div>
@@ -289,6 +442,8 @@ const Auth = () => {
                             onCheckedChange={field.onChange}
                             id="pdpaConsent"
                             aria-label="ยินยอมให้เก็บข้อมูลส่วนบุคคล"
+                            aria-required="true"
+                            aria-invalid={!!form.formState.errors.pdpaConsent}
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -341,6 +496,7 @@ const Auth = () => {
                   type="submit"
                   className="w-full bg-infi-green hover:bg-infi-green-hover transition-transform hover:scale-[1.02]"
                   disabled={isLoading}
+                  aria-label={isLoginView ? "ปุ่มเข้าสู่ระบบ" : "ปุ่มสมัครสมาชิก"}
                 >
                   {isLoading
                     ? 'กำลังดำเนินการ...'
@@ -348,6 +504,19 @@ const Auth = () => {
                     ? 'เข้าสู่ระบบ'
                     : 'สมัครสมาชิก'}
                 </Button>
+
+                {isLoginView && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => sendOTP(form.getValues('email'))}
+                    disabled={!form.getValues('email') || isLoading}
+                    aria-label="ส่งรหัส OTP"
+                  >
+                    เข้าสู่ระบบด้วยรหัส OTP
+                  </Button>
+                )}
               </form>
             </Form>
 
@@ -398,7 +567,7 @@ const Auth = () => {
         </div>
       </div>
 
-      <footer className="bg-white border-t py-4">
+      <footer className="bg-white border-t py-4" aria-label="footer">
         <div className="container mx-auto px-4 text-center text-sm text-infi-gray">
           <p>© {new Date().getFullYear()} INFIWORLD.COM - แพลตฟอร์มที่รวมบริการซื้อ-ขาย-เช่า, งานฟรีแลนซ์, การจอง, และแผนที่ร้านค้าที่รับคริปโต</p>
           <div className="mt-2 space-x-4">

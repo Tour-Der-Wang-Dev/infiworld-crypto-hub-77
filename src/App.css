@@ -4,6 +4,7 @@
   margin: 0 auto;
   padding: 1rem;
   text-align: center;
+  font-family: 'Sarabun', sans-serif;
 }
 
 .logo {
@@ -52,4 +53,39 @@
   .card {
     padding: 1em;
   }
+}
+
+/* Thai language optimizations */
+body, input, button, textarea, select {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 16px;
+}
+
+/* WCAG 2.1 compliance - better focus indicators */
+:focus {
+  outline: 2px solid #28a745;
+  outline-offset: 2px;
+}
+
+/* Accessibility - Skip to content link (hidden until focused) */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.skip-to-content:focus {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  background: #28a745;
+  color: white;
+  font-weight: bold;
+  z-index: 9999;
 }

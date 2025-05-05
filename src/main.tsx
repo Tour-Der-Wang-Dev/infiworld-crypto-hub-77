@@ -13,6 +13,12 @@ document.head.appendChild(metaTag);
 // Add mobile-specific touch handling
 document.addEventListener('touchstart', function() {}, {passive: true});
 
+// Add Thai font (Sarabun)
+const fontLink = document.createElement('link');
+fontLink.rel = 'stylesheet';
+fontLink.href = 'https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap';
+document.head.appendChild(fontLink);
+
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
     <App />
