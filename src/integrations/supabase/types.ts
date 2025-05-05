@@ -9,6 +9,53 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      escrow_transactions: {
+        Row: {
+          buyer_id: string
+          contract_details: Json | null
+          created_at: string
+          escrow_status: string
+          id: string
+          payment_id: string
+          release_conditions: string | null
+          release_date: string | null
+          seller_id: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          contract_details?: Json | null
+          created_at?: string
+          escrow_status?: string
+          id?: string
+          payment_id: string
+          release_conditions?: string | null
+          release_date?: string | null
+          seller_id: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          contract_details?: Json | null
+          created_at?: string
+          escrow_status?: string
+          id?: string
+          payment_id?: string
+          release_conditions?: string | null
+          release_date?: string | null
+          seller_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escrow_transactions_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string | null
@@ -149,30 +196,111 @@ export type Database = {
           },
         ]
       }
+      payment_consents: {
+        Row: {
+          consent_version: string
+          consented_at: string
+          id: string
+          ip_address: string | null
+          user_id: string
+        }
+        Insert: {
+          consent_version?: string
+          consented_at?: string
+          id?: string
+          ip_address?: string | null
+          user_id: string
+        }
+        Update: {
+          consent_version?: string
+          consented_at?: string
+          id?: string
+          ip_address?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          payment_details: Json | null
+          payment_method: string
+          payment_status: string
+          receipt_url: string | null
+          refund_status: string | null
+          refunded_amount: number | null
+          related_id: string
+          related_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          payment_details?: Json | null
+          payment_method: string
+          payment_status?: string
+          receipt_url?: string | null
+          refund_status?: string | null
+          refunded_amount?: number | null
+          related_id: string
+          related_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          payment_details?: Json | null
+          payment_method?: string
+          payment_status?: string
+          receipt_url?: string | null
+          refund_status?: string | null
+          refunded_amount?: number | null
+          related_id?: string
+          related_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
           first_name: string | null
           id: string
           last_name: string | null
+          payment_consent_status: string | null
           phone: string | null
           profile_image: string | null
+          role: string | null
         }
         Insert: {
           created_at?: string | null
           first_name?: string | null
           id: string
           last_name?: string | null
+          payment_consent_status?: string | null
           phone?: string | null
           profile_image?: string | null
+          role?: string | null
         }
         Update: {
           created_at?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
+          payment_consent_status?: string | null
           phone?: string | null
           profile_image?: string | null
+          role?: string | null
         }
         Relationships: []
       }
@@ -436,7 +564,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

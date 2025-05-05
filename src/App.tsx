@@ -17,6 +17,7 @@ import Verification from "./pages/Verification";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Transactions from "./pages/Transactions";
 import { useEffect } from "react";
 
 const queryClient = new QueryClient({
@@ -29,7 +30,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const CanonicalTag = ({ path }: { path: string }) => {
+export const CanonicalTag = ({ path }: { path: string }) => {
   useEffect(() => {
     // Set canonical URL tag
     let link: HTMLLinkElement | null = document.querySelector('link[rel="canonical"]');
@@ -94,6 +95,9 @@ const App = () => (
               <Route path="/auth" element={<RouteWithCanonical path="/auth" element={<Auth />} />} />
               <Route path="/user-profile" element={
                 <RouteWithCanonical path="/user-profile" element={<RequireAuth><Profile /></RequireAuth>} />
+              } />
+              <Route path="/my-transactions" element={
+                <RouteWithCanonical path="/my-transactions" element={<RequireAuth><Transactions /></RequireAuth>} />
               } />
               
               {/* Legacy URL redirects */}

@@ -1,136 +1,93 @@
-
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import React, { useState } from "react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Badge } from "@/components/ui/badge";
 import { Heart } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { PaymentModal } from "@/components/payments/PaymentModal";
+import { useAuth } from "@/hooks/use-auth";
 
-interface ListingCardProps {
+interface ListingProps {
   listing: {
     id: string;
     title: string;
     description: string;
     price: number;
     type: "car" | "property";
-    image?: string;
-    images?: string[];
+    images: string[];
     is_rental: boolean;
     location: string;
     features: string[];
+    status: string;
   };
-  onView?: () => void;
-  onFavoriteToggle?: () => void;
+  onView: () => void;
+  onFavoriteToggle: () => void;
 }
 
-const ListingCard = ({ listing, onView, onFavoriteToggle }: ListingCardProps) => {
-  const [showDetails, setShowDetails] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const isMobile = useIsMobile();
+export default function ListingCard({ listing, onView, onFavoriteToggle }: ListingProps) {
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const { user } = useAuth();
 
-  // Format price based on rental or sale
-  const formattedPrice = new Intl.NumberFormat("th-TH").format(listing.price);
-  const priceDisplay = listing.is_rental ? 
-    `฿${formattedPrice}/เดือน` : 
-    `฿${formattedPrice}`;
-
-  const handleShowDetails = () => {
-    setShowDetails(!showDetails);
-    if (!showDetails && onView) {
-      onView();
+  const handleBuyClick = () => {
+    if (!user) {
+      window.location.href = "/auth";
+      return;
     }
+    
+    setIsPaymentModalOpen(true);
   };
-
-  const handleFavoriteToggle = () => {
-    if (onFavoriteToggle) {
-      setIsFavorite(!isFavorite);
-      onFavoriteToggle();
-    }
-  };
-
-  // Get image from listing - support both legacy and new data structure
-  const imageUrl = listing.image || 
-    (listing.images && listing.images.length > 0 ? listing.images[0] : "/placeholder.svg");
 
   return (
-    <Card className="overflow-hidden h-full flex flex-col transition-shadow hover:shadow-md">
+    <Card className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="relative">
-        <AspectRatio ratio={16 / 9}>
-          <img 
-            src={imageUrl} 
-            alt={listing.title}
-            className="w-full h-full object-cover"
-          />
-        </AspectRatio>
-        <div className="absolute top-2 left-2 flex gap-1 sm:gap-2">
-          <Badge variant="default" className="bg-infi-green text-xs">
-            {listing.type === "car" ? "รถยนต์" : "อสังหาริมทรัพย์"}
-          </Badge>
-          {listing.is_rental ? (
-            <Badge variant="outline" className="bg-white text-xs">เช่า</Badge>
-          ) : (
-            <Badge variant="outline" className="bg-white text-xs">ขาย</Badge>
-          )}
-        </div>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/80 hover:bg-white"
-          onClick={handleFavoriteToggle}
-        >
-          <Heart 
-            className={`h-4 w-4 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} 
-          />
-        </Button>
+        <img
+          src={listing.images[0] || "https://placehold.co/600x400"}
+          alt={listing.title}
+          className="w-full h-48 object-cover"
+        />
+        <Badge className="absolute top-2 right-2">
+          {listing.is_rental ? "ให้เช่า" : "ขาย"}
+        </Badge>
       </div>
-
-      <CardHeader className="pb-1 sm:pb-2 px-3 sm:px-4 pt-2 sm:pt-3">
-        <div className="text-base sm:text-lg font-semibold line-clamp-1">{listing.title}</div>
-        <div className="text-xs sm:text-sm text-infi-gray">{listing.location}</div>
+      <CardHeader>
+        <CardTitle>{listing.title}</CardTitle>
+        <CardDescription>{listing.location}</CardDescription>
       </CardHeader>
-      
-      <CardContent className="flex-grow px-3 sm:px-4 py-1 sm:py-2">
-        <div className="text-lg sm:text-xl font-bold text-infi-green mb-1 sm:mb-2">
-          {priceDisplay}
+      <CardContent className="grid gap-4">
+        <p className="text-sm text-gray-600">{listing.description}</p>
+        <div className="flex space-x-2">
+          {listing.features.map((feature) => (
+            <Badge key={feature} variant="secondary">
+              {feature}
+            </Badge>
+          ))}
         </div>
-        <p className={`text-infi-gray text-xs sm:text-sm ${showDetails ? '' : 'line-clamp-2'}`}>
-          {listing.description}
-        </p>
-        
-        {showDetails && (
-          <div className="mt-3 sm:mt-4">
-            <div className="text-xs sm:text-sm font-semibold mb-1">คุณสมบัติ:</div>
-            <div className="flex flex-wrap gap-1">
-              {listing.features.map((feature, index) => (
-                <Badge key={index} variant="outline" className="text-xs">
-                  {feature}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
       </CardContent>
-
-      <CardFooter className="flex justify-between pt-0 px-3 sm:px-4 pb-3 sm:pb-4">
+      <CardFooter className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Button variant="ghost" size="icon" onClick={onFavoriteToggle}>
+            <Heart className="h-5 w-5" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={onView}>
+            ดูรายละเอียด
+          </Button>
+        </div>
         <Button 
-          variant="outline"
-          className="text-xs h-8 sm:h-9" 
-          onClick={handleShowDetails}
+          className="w-full bg-infi-green hover:bg-infi-green-hover"
+          onClick={handleBuyClick}
         >
-          {showDetails ? "แสดงน้อยลง" : "ดูเพิ่มเติม"}
-        </Button>
-        <Button className="text-xs h-8 sm:h-9 bg-infi-green hover:bg-infi-green-hover">
-          {listing.is_rental ? "จองเช่า" : "ซื้อเลย"}
+          {listing.is_rental ? "เช่า" : "ซื้อ"} - ฿{listing.price.toLocaleString()}
         </Button>
       </CardFooter>
+      <PaymentModal 
+        open={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        amount={listing.price}
+        paymentType="marketplace"
+        relatedId={listing.id}
+        useEscrow={listing.type === "property" || listing.price > 1000000}
+        sellerId="00000000-0000-0000-0000-000000000000" // Replace with actual seller ID in real implementation
+      />
     </Card>
   );
-};
-
-export default ListingCard;
+}

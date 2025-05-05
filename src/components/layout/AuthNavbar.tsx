@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
@@ -12,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Settings, UserCircle } from "lucide-react";
+import { User, LogOut, Settings, UserCircle, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 
 export function AuthNavbar() {
@@ -82,6 +83,12 @@ export function AuthNavbar() {
                 <Link to="/user-profile" className="cursor-pointer flex items-center">
                   <UserCircle className="mr-2 h-4 w-4" />
                   <span>โปรไฟล์</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/my-transactions" className="cursor-pointer flex items-center">
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  <span>ธุรกรรมของฉัน</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
