@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Upload, FileText, CheckCircle, XCircle, Clock } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import SEO from "@/components/common/SEO";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -74,6 +75,31 @@ const Verification = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // SEO Schema for KYC verification page
+  const verificationSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "ID Verification - INFIWORLD",
+    "description": "Verify your identity on INFIWORLD to access all platform features. Secure and compliant with data protection regulations.",
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://infiworld.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "ID Verification",
+          "item": "https://infiworld.com/identity-verification"
+        }
+      ]
+    }
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -202,6 +228,13 @@ const Verification = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="ID Verification - INFIWORLD | ยืนยันตัวตนด้วยเอกสาร"
+        description="ยืนยันตัวตนของคุณด้วยบัตรประชาชนหรือพาสปอร์ตเพื่อเข้าถึงฟีเจอร์ทั้งหมดบน INFIWORLD อย่างปลอดภัย"
+        keywords="ยืนยันตัวตน, KYC, INFIWORLD, บัตรประชาชน, พาสปอร์ต, การยืนยันตัวตนออนไลน์"
+        canonicalPath="/identity-verification"
+        schemaMarkup={verificationSchema}
+      />
       <Navbar />
       
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -277,6 +310,7 @@ const Verification = () => {
                                   checked={field.value === "id_card"}
                                   onChange={() => field.onChange("id_card")}
                                   className="h-4 w-4"
+                                  aria-label="Select ID Card as document type"
                                 />
                                 <span>ID Card</span>
                               </label>
@@ -288,6 +322,7 @@ const Verification = () => {
                                   checked={field.value === "passport"}
                                   onChange={() => field.onChange("passport")}
                                   className="h-4 w-4"
+                                  aria-label="Select Passport as document type"
                                 />
                                 <span>Passport</span>
                               </label>
@@ -306,7 +341,7 @@ const Verification = () => {
                           <FormLabel>Upload Document</FormLabel>
                           <FormControl>
                             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center">
-                              <Upload className="h-10 w-10 text-gray-400 mb-2" />
+                              <Upload className="h-10 w-10 text-gray-400 mb-2" aria-hidden="true" />
                               <p className="mb-2 text-sm text-gray-600">
                                 PDF, JPG or PNG (max 5MB)
                               </p>
@@ -319,10 +354,11 @@ const Verification = () => {
                                   onChange(e.target.files);
                                 }}
                                 className="hidden"
+                                aria-label="Upload verification document"
                               />
                               <label htmlFor="documentFile" className="cursor-pointer">
                                 <Button type="button" variant="outline">
-                                  <FileText className="mr-2 h-4 w-4" /> 
+                                  <FileText className="mr-2 h-4 w-4" aria-hidden="true" /> 
                                   Select File
                                 </Button>
                               </label>
@@ -347,6 +383,7 @@ const Verification = () => {
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              aria-label="Agree to terms and conditions"
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
@@ -363,6 +400,7 @@ const Verification = () => {
                       type="submit" 
                       className="bg-infi-green hover:bg-infi-green-hover w-full"
                       disabled={isSubmitting}
+                      aria-label="Submit for verification"
                     >
                       {isSubmitting ? "Uploading..." : "Submit for Verification"}
                     </Button>

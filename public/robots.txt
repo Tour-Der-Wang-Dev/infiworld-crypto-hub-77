@@ -1,14 +1,20 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
 
 User-agent: *
 Allow: /
+
+# Main sections
+Allow: /marketplace
+Allow: /freelance
+Allow: /reservations
+Allow: /map
+Allow: /verification
+Allow: /profile
+Allow: /transactions
+
+# Disallow sensitive routes
+Disallow: /auth
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://infiworld.com/sitemap.xml
+

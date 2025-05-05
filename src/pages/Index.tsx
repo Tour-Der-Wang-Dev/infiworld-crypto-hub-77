@@ -3,50 +3,67 @@ import { Link } from "react-router-dom";
 import { AuthNavbar } from "@/components/layout/AuthNavbar";
 import Footer from "@/components/layout/Footer";
 import ServiceCard from "@/components/home/ServiceCard";
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/common/SEO";
+import { Image } from "@/components/ui/image";
 
 const Index = () => {
+  // Homepage schema markup for rich results
+  const homeSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "INFIWORLD",
+    "url": "https://infiworld.com",
+    "logo": "https://infiworld.com/ChatGPT Image 3 พ.ค. 2568 18_28_43.png",
+    "description": "แพลตฟอร์มครบวงจรที่รองรับการซื้อขายด้วยเงินสด บัตรเครดิต และคริปโตเคอเรนซี",
+    "sameAs": [
+      "https://facebook.com/infiworld",
+      "https://twitter.com/infiworld",
+      "https://instagram.com/infiworld"
+    ]
+  };
+
   const services = [
     {
       icon: "https://placehold.co/200?text=👨‍💻",
       title: "Freelance",
       description: "จ้างฟรีแลนซ์มืออาชีพในทุกสาขา ได้งานมีคุณภาพ ชำระเงินง่ายด้วยคริปโต",
-      link: "/freelance-services"
+      link: "/freelance"
     },
     {
       icon: "https://placehold.co/200?text=🏠",
       title: "Marketplace",
       description: "ซื้อ ขาย เช่า รถและอสังหาริมทรัพย์ ปลอดภัย มั่นใจ ด้วยระบบ Smart Contract",
-      link: "/buy-sell-marketplace"
+      link: "/marketplace"
     },
     {
       icon: "https://placehold.co/200?text=✈️",
       title: "Reservations",
       description: "จองตั๋วเครื่องบินและโรงแรมทั่วโลก ราคาพิเศษเมื่อชำระด้วยคริปโต",
-      link: "/travel-reservations"
+      link: "/reservations"
     },
     {
       icon: "https://placehold.co/200?text=🗺️",
       title: "Map",
       description: "ค้นหาร้านค้าที่รับชำระด้วยคริปโตใกล้คุณ ง่ายและสะดวก",
-      link: "/crypto-store-map"
+      link: "/map"
     },
     {
       icon: "https://placehold.co/200?text=🔐",
       title: "Verify",
       description: "ตรวจสอบและยืนยันตัวตนด้วยระบบที่ปลอดภัย รองรับ KYC/AML",
-      link: "/identity-verification"
+      link: "/verification"
     }
   ];
 
   return (
     <>
-      <Helmet>
-        <title>INFIWORLD - ซื้อ ขาย เช่า จอง ด้วยคริปโตและบัตร</title>
-        <meta name="description" content="แพลตฟอร์มครบวงจรที่รองรับการซื้อขายด้วยเงินสด บัตรเครดิต และคริปโตเคอเรนซี" />
-        <meta name="keywords" content="คริปโต, บล็อกเชน, ฟรีแลนซ์, อสังหาริมทรัพย์, จองตั๋วเครื่องบิน, marketplace, เงินดิจิทัล" />
-        <link rel="canonical" href={window.location.origin + "/"} />
-      </Helmet>
+      <SEO 
+        title="INFIWORLD - ซื้อ ขาย เช่า จอง ด้วยคริปโตและบัตร | คริปโตแพลตฟอร์มไทย"
+        description="INFIWORLD แพลตฟอร์มครบวงจรที่รองรับการซื้อขายด้วยเงินสด บัตรเครดิต และคริปโตเคอเรนซี สำหรับฟรีแลนซ์ อสังหาริมทรัพย์ และการจองบริการ"
+        keywords="คริปโตเคอเรนซี, ฟรีแลนซ์, อสังหาริมทรัพย์, คริปโตแพลตฟอร์มไทย, การชำระเงินด้วยคริปโต, บล็อกเชน"
+        canonicalPath="/"
+        schemaMarkup={homeSchema}
+      />
 
       <AuthNavbar />
       <main>
@@ -62,7 +79,7 @@ const Index = () => {
                   แพลตฟอร์มครบวงจรที่รองรับการซื้อขายด้วยเงินสด บัตรเครดิต และคริปโตเคอเรนซี เพื่อตอบโจทย์ทุกความต้องการในโลกดิจิตอล
                 </p>
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link to="/freelance-services" className="btn-primary text-center">
+                  <Link to="/freelance" className="btn-primary text-center">
                     เริ่มต้นใช้งาน
                   </Link>
                   <a href="#services" className="btn-secondary text-center">
@@ -73,15 +90,15 @@ const Index = () => {
               <div className="md:w-1/2 md:pl-8">
                 <div className="relative">
                   <div className="animate-float">
-                    <img 
+                    <Image 
                       src="https://placehold.co/600x400?text=INFIWORLD+Platform+Preview" 
-                      alt="INFIWORLD Platform" 
+                      alt="INFIWORLD Platform คริปโตแพลตฟอร์มครบวงจร สำหรับการซื้อขายด้วยคริปโต" 
                       className="rounded-lg shadow-2xl"
                     />
                   </div>
                   <div className="absolute -bottom-5 -right-5 bg-white p-3 rounded-lg shadow-lg hidden md:block">
                     <div className="flex items-center">
-                      <img src="https://placehold.co/40?text=₿" alt="Cryptocurrency" className="w-8 h-8 mr-2" />
+                      <img src="https://placehold.co/40?text=₿" alt="สัญลักษณ์ Cryptocurrency" className="w-8 h-8 mr-2" />
                       <div>
                         <p className="text-infi-dark font-semibold">Crypto Ready</p>
                         <p className="text-xs text-infi-gray">รองรับการชำระเงินด้วยคริปโต</p>
@@ -131,7 +148,7 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div className="text-center p-6">
                 <div className="bg-infi-light w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <img src="https://placehold.co/200?text=🔒" alt="Security Icon" className="w-8 h-8" />
+                  <img src="https://placehold.co/200?text=🔒" alt="ไอคอนความปลอดภัย" className="w-8 h-8" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">ปลอดภัยสูงสุด</h3>
                 <p className="text-infi-gray">
