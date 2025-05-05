@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { HelmetProvider } from 'react-helmet-async'
-import { Toaster } from "sonner"
 
 // Add viewport meta tag to ensure proper mobile rendering
 const metaTag = document.createElement('meta');
@@ -29,6 +28,5 @@ document.head.appendChild(pciScript);
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
     <App />
-    <Toaster richColors closeButton position="top-right" />
   </HelmetProvider>
 );
