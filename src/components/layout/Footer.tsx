@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-infi-dark text-white py-12">
+    <footer className="bg-infi-dark text-white py-8 sm:py-12">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="mb-4 sm:mb-0">
             <h3 className="text-xl font-bold mb-4">INFIWORLD</h3>
-            <p className="text-gray-300 mb-4">
+            <p className="text-gray-300 mb-4 text-sm sm:text-base">
               ซื้อ ขาย เช่า จอง ด้วยคริปโตและบัตร - แพลตฟอร์มครบวงจรสำหรับการทำธุรกรรมแบบครบวงจร
             </p>
             <div className="flex space-x-4">
@@ -30,20 +30,20 @@ const Footer = () => {
             </div>
           </div>
           
-          <div>
+          <div className="mb-4 sm:mb-0">
             <h3 className="text-lg font-semibold mb-4">บริการของเรา</h3>
-            <ul className="space-y-2">
-              <li><Link to="/freelance" className="text-gray-300 hover:text-white transition-colors">Freelance</Link></li>
-              <li><Link to="/marketplace" className="text-gray-300 hover:text-white transition-colors">Marketplace</Link></li>
-              <li><Link to="/reservations" className="text-gray-300 hover:text-white transition-colors">Reservations</Link></li>
-              <li><Link to="/map" className="text-gray-300 hover:text-white transition-colors">Map</Link></li>
-              <li><Link to="/verify" className="text-gray-300 hover:text-white transition-colors">Verify</Link></li>
+            <ul className="space-y-2 text-sm sm:text-base">
+              <li><Link to="/freelance-services" className="text-gray-300 hover:text-white transition-colors">Freelance</Link></li>
+              <li><Link to="/buy-sell-marketplace" className="text-gray-300 hover:text-white transition-colors">Marketplace</Link></li>
+              <li><Link to="/travel-reservations" className="text-gray-300 hover:text-white transition-colors">Reservations</Link></li>
+              <li><Link to="/crypto-store-map" className="text-gray-300 hover:text-white transition-colors">Map</Link></li>
+              <li><Link to="/identity-verification" className="text-gray-300 hover:text-white transition-colors">Verify</Link></li>
             </ul>
           </div>
           
-          <div>
+          <div className="mb-4 sm:mb-0">
             <h3 className="text-lg font-semibold mb-4">เกี่ยวกับเรา</h3>
-            <ul className="space-y-2">
+            <ul className="space-y-2 text-sm sm:text-base">
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors">เกี่ยวกับ INFIWORLD</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors">ทีมงาน</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors">ร่วมงานกับเรา</a></li>
@@ -54,7 +54,7 @@ const Footer = () => {
           
           <div>
             <h3 className="text-lg font-semibold mb-4">ข้อมูลเพิ่มเติม</h3>
-            <ul className="space-y-2">
+            <ul className="space-y-2 text-sm sm:text-base">
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors">นโยบายความเป็นส่วนตัว</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors">เงื่อนไขการใช้งาน</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors">คำถามที่พบบ่อย</a></li>
@@ -65,14 +65,14 @@ const Footer = () => {
         </div>
         
         <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 text-xs sm:text-sm mb-4 md:mb-0">
             &copy; {new Date().getFullYear()} INFIWORLD. All rights reserved.
           </p>
-          <div className="mt-4 md:mt-0 flex items-center space-x-4">
-            <img src="https://placehold.co/40x25?text=VISA" alt="VISA" className="h-6" />
-            <img src="https://placehold.co/40x25?text=MC" alt="MasterCard" className="h-6" />
-            <img src="https://placehold.co/40x25?text=BTC" alt="Bitcoin" className="h-6" />
-            <img src="https://placehold.co/40x25?text=ETH" alt="Ethereum" className="h-6" />
+          <div className="flex items-center flex-wrap justify-center gap-2 sm:space-x-4">
+            <img src="https://placehold.co/40x25?text=VISA" alt="VISA" className="h-5 sm:h-6" />
+            <img src="https://placehold.co/40x25?text=MC" alt="MasterCard" className="h-5 sm:h-6" />
+            <img src="https://placehold.co/40x25?text=BTC" alt="Bitcoin" className="h-5 sm:h-6" />
+            <img src="https://placehold.co/40x25?text=ETH" alt="Ethereum" className="h-5 sm:h-6" />
           </div>
         </div>
       </div>

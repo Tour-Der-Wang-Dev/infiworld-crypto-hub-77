@@ -15,10 +15,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User, LogOut, Settings, UserCircle, CreditCard } from "lucide-react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function AuthNavbar() {
   const { user, signOut } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleSignOut = async () => {
     try {
@@ -54,7 +56,7 @@ export function AuthNavbar() {
       <Navbar />
       
       {/* Authentication overlay - positioned absolute to avoid modifying the original Navbar */}
-      <div className="absolute top-0 right-0 h-16 flex items-center pr-4">
+      <div className={`absolute top-0 right-0 h-16 flex items-center ${isMobile ? 'pr-12' : 'pr-4'}`}>
         {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -73,39 +75,39 @@ export function AuthNavbar() {
                   <p className="text-sm font-medium leading-none">
                     {user.user_metadata?.name || "ผู้ใช้"}
                   </p>
-                  <p className="text-xs leading-none text-muted-foreground">
+                  <p className="text-xs leading-none text-muted-foreground truncate">
                     {user.email}
                   </p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/user-profile" className="cursor-pointer flex items-center">
+                <Link to="/user-profile" className="cursor-pointer flex items-center min-h-9">
                   <UserCircle className="mr-2 h-4 w-4" />
                   <span>โปรไฟล์</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/my-transactions" className="cursor-pointer flex items-center">
+                <Link to="/my-transactions" className="cursor-pointer flex items-center min-h-9">
                   <CreditCard className="mr-2 h-4 w-4" />
                   <span>ธุรกรรมของฉัน</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/identity-verification" className="cursor-pointer flex items-center">
+                <Link to="/identity-verification" className="cursor-pointer flex items-center min-h-9">
                   <User className="mr-2 h-4 w-4" />
                   <span>ยืนยันตัวตน</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/settings" className="cursor-pointer flex items-center">
+                <Link to="/settings" className="cursor-pointer flex items-center min-h-9">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>ตั้งค่า</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                className="cursor-pointer flex items-center text-red-600" 
+                className="cursor-pointer flex items-center text-red-600 min-h-9" 
                 onClick={handleSignOut}
                 disabled={isLoading}
               >

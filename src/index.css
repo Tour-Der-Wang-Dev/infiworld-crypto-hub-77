@@ -101,27 +101,42 @@
   html {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
+    height: 100%;
+    height: -webkit-fill-available;
   }
 
   body {
     @apply bg-background text-foreground font-sarabun;
     min-height: 100vh;
     min-height: -webkit-fill-available;
-  }
-
-  /* Fix for iOS height issue */
-  html {
-    height: -webkit-fill-available;
+    overflow-x: hidden;
+    touch-action: manipulation;
   }
 
   /* Improve tap target sizes on mobile */
   button, a {
     @apply outline-none;
+    min-height: 44px;
+    min-width: 44px;
   }
 
   input, select, textarea {
     @apply text-base;
     font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  /* Prevent text size adjustment on orientation change */
+  @media screen and (max-device-width: 480px) and (orientation: landscape) {
+    html {
+      -webkit-text-size-adjust: none;
+    }
+  }
+  
+  /* Fix iOS 100vh issue */
+  @supports (-webkit-touch-callout: none) {
+    .h-screen {
+      height: -webkit-fill-available;
+    }
   }
 }
 
@@ -146,5 +161,20 @@
   /* Mobile-optimized grids */
   .responsive-grid {
     @apply grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6;
+  }
+  
+  /* Mobile-friendly list items */
+  .mobile-list-item {
+    @apply py-3 px-2 sm:py-4 sm:px-4;
+  }
+  
+  /* Mobile-friendly cards */
+  .mobile-card {
+    @apply p-3 sm:p-5 rounded-lg;
+  }
+  
+  /* Collapsible sections for mobile */
+  .mobile-collapsible {
+    @apply overflow-hidden transition-all duration-300 ease-in-out;
   }
 }

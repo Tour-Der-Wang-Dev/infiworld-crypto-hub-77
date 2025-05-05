@@ -9,6 +9,7 @@ import Navbar from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
 import { Tables } from "@/integrations/supabase/types";
 import { useToast } from "@/components/ui/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Store = Tables<"stores">;
 
@@ -21,6 +22,8 @@ const Map = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [tokenInput, setTokenInput] = useState("");
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+  const [isFilterVisible, setIsFilterVisible] = useState(!isMobile);
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -59,6 +62,11 @@ const Map = () => {
   }, [toast]);
 
   useEffect(() => {
+    // Set filter visibility based on mobile state
+    setIsFilterVisible(!isMobile);
+  }, [isMobile]);
+
+  useEffect(() => {
     if (selectedCategory) {
       setFilteredStores(stores.filter(store => store.category === selectedCategory));
     } else {
@@ -87,6 +95,10 @@ const Map = () => {
         description: "Mapbox token saved successfully.",
       });
     }
+  };
+
+  const toggleFilters = () => {
+    setIsFilterVisible(!isFilterVisible);
   };
 
   return (
@@ -133,14 +145,28 @@ const Map = () => {
           </div>
         ) : (
           <>
-            <div className="absolute top-4 left-4 z-10 max-w-sm">
-              <StoreFilters onCategoryChange={handleCategoryFilter} selectedCategory={selectedCategory} />
-            </div>
+            {isMobile && (
+              <Button
+                className="absolute top-4 right-4 z-10 bg-white text-infi-dark shadow-md"
+                onClick={toggleFilters}
+                size="sm"
+              >
+                {isFilterVisible ? "Hide Filters" : "Show Filters"}
+              </Button>
+            )}
+            
+            {isFilterVisible && (
+              <div className={`absolute top-4 left-4 z-10 max-w-sm transition-all duration-300 ${isMobile ? 'bg-white p-3 rounded-lg shadow-lg' : ''}`}>
+                <StoreFilters onCategoryChange={handleCategoryFilter} selectedCategory={selectedCategory} />
+              </div>
+            )}
+            
             <MapComponent 
               stores={filteredStores} 
               onStoreClick={handleStoreClick}
               mapboxToken={mapboxToken}
             />
+            
             {selectedStore && (
               <StoreDetails 
                 store={selectedStore} 

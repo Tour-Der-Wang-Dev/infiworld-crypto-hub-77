@@ -115,29 +115,62 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Optimized with animation and better touch targets */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200 py-2">
-          <div className="container mx-auto px-4 flex flex-col space-y-3">
-            <Link to="/freelance-services" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Freelance</Link>
-            <Link to="/buy-sell-marketplace" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Marketplace</Link>
-            <Link to="/travel-reservations" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Reservations</Link>
-            <Link to="/crypto-store-map" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Map</Link>
-            <Link to="/identity-verification" className="py-2 text-infi-dark hover:text-infi-green transition-colors">Verify</Link>
+        <div className="md:hidden bg-white border-t border-gray-200 animate-fade-in">
+          <div className="container mx-auto px-4 flex flex-col space-y-3 py-2">
+            <Link 
+              to="/freelance-services" 
+              className="py-3 px-2 text-infi-dark hover:text-infi-green transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Freelance
+            </Link>
+            <Link 
+              to="/buy-sell-marketplace" 
+              className="py-3 px-2 text-infi-dark hover:text-infi-green transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Marketplace
+            </Link>
+            <Link 
+              to="/travel-reservations" 
+              className="py-3 px-2 text-infi-dark hover:text-infi-green transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Reservations
+            </Link>
+            <Link 
+              to="/crypto-store-map" 
+              className="py-3 px-2 text-infi-dark hover:text-infi-green transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Map
+            </Link>
+            <Link 
+              to="/identity-verification" 
+              className="py-3 px-2 text-infi-dark hover:text-infi-green transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Verify
+            </Link>
             <div className="flex flex-col space-y-2 pt-2">
-              <Button variant="outline" size="sm" className="w-full justify-center">EN | TH</Button>
+              <Button variant="outline" size="sm" className="w-full justify-center py-5">EN | TH</Button>
               {user ? (
                 <Button 
                   onClick={handleLogout} 
-                  className="w-full bg-infi-green hover:bg-infi-green-hover"
+                  className="w-full bg-infi-green hover:bg-infi-green-hover py-5"
                   disabled={isLoading}
                 >
                   {isLoading ? "กำลังออกจากระบบ..." : "ออกจากระบบ"}
                 </Button>
               ) : (
                 <Button 
-                  onClick={() => navigate('/auth')} 
-                  className="w-full bg-infi-green hover:bg-infi-green-hover"
+                  onClick={() => {
+                    navigate('/auth');
+                    setIsMenuOpen(false);
+                  }} 
+                  className="w-full bg-infi-green hover:bg-infi-green-hover py-5"
                 >
                   เข้าสู่ระบบ
                 </Button>
