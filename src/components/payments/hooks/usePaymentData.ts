@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
@@ -76,11 +76,20 @@ export const usePaymentData = (initialLimit?: number) => {
     }
   };
 
+  // Load transactions on first render
+  useEffect(() => {
+    if (user) {
+      fetchTransactions();
+    }
+  }, [user]);
+
   // Memoized functions to avoid unnecessary re-renders
   const handleRequestRefund = async (transactionId: string) => {
     if (!user) return;
     
     try {
+      toast.loading("กำลังดำเนินการขอคืนเงิน...");
+      
       const { error } = await supabase
         .from("payments")
         .update({ refund_status: "requested" })
@@ -88,6 +97,7 @@ export const usePaymentData = (initialLimit?: number) => {
         
       if (error) throw error;
       
+      toast.dismiss();
       toast.success("ส่งคำขอคืนเงินเรียบร้อยแล้ว", {
         description: "เจ้าหน้าที่จะตรวจสอบคำขอและดำเนินการต่อไป"
       });
@@ -95,6 +105,7 @@ export const usePaymentData = (initialLimit?: number) => {
       // Refresh transactions list
       fetchTransactions();
     } catch (error) {
+      toast.dismiss();
       console.error("Error requesting refund:", error);
       toast.error("ไม่สามารถส่งคำขอคืนเงินได้", {
         description: "กรุณาลองใหม่อีกครั้ง"

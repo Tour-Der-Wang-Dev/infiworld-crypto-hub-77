@@ -28,7 +28,7 @@ export interface Transaction {
   currency: string;
   payment_method: string;
   payment_status: string;
-  related_type: PaymentType; // Fixed type here
+  related_type: PaymentType; 
   related_id: string;
   created_at: string;
   updated_at: string;
@@ -79,4 +79,6 @@ export interface TransactionsListProps {
   limit?: number;
   showRefreshButton?: boolean;
   className?: string;
+  filterType?: PaymentType;
+  showEscrowOnly?: boolean;
 }

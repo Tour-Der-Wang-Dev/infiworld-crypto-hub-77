@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, RefreshCcw } from "lucide-react";
+import { Eye, RefreshCcw, FileText } from "lucide-react";
 import { Transaction, TransactionsListProps } from "@/components/payments/types";
 import { cn } from "@/lib/utils";
 import { EscrowModal } from "@/components/payments/EscrowModal";
@@ -26,7 +26,9 @@ import { usePaymentData } from "@/components/payments/hooks/usePaymentData";
 export function TransactionsList({ 
   limit,
   showRefreshButton = true,
-  className 
+  className,
+  filterType,
+  showEscrowOnly = false
 }: TransactionsListProps) {
   const {
     transactions,
@@ -74,6 +76,17 @@ export function TransactionsList({
     });
   };
 
+  // Filter transactions based on props
+  const filteredTransactions = transactions.filter(transaction => {
+    if (filterType && transaction.related_type !== filterType) {
+      return false;
+    }
+    if (showEscrowOnly && !transaction.escrow) {
+      return false;
+    }
+    return true;
+  });
+
   return (
     <>
       <div className={cn("rounded-md border", className)}>
@@ -105,7 +118,7 @@ export function TransactionsList({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {transactions.length === 0 && !isLoading ? (
+            {filteredTransactions.length === 0 && !isLoading ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
                   ไม่พบข้อมูลธุรกรรม
@@ -120,7 +133,7 @@ export function TransactionsList({
                 </TableCell>
               </TableRow>
             ) : (
-              transactions.map((transaction) => (
+              filteredTransactions.map((transaction) => (
                 <TableRow key={transaction.id}>
                   <TableCell className="font-medium">
                     {formatDate(transaction.created_at)}
@@ -143,6 +156,16 @@ export function TransactionsList({
                           <a href={transaction.receipt_url} target="_blank" rel="noopener noreferrer">
                             <Eye className="h-4 w-4 mr-1" /> ใบเสร็จ
                           </a>
+                        </Button>
+                      )}
+                      
+                      {transaction.escrow && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleOpenEscrowModal(transaction)}
+                        >
+                          <FileText className="h-4 w-4 mr-1" /> สัญญา
                         </Button>
                       )}
                       

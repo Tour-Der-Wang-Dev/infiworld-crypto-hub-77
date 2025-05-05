@@ -1,126 +1,162 @@
 
-import { AuthNavbar } from "@/components/layout/AuthNavbar";
-import { TransactionsList } from "@/components/payments/TransactionsList";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { useAuth } from "@/hooks/use-auth";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import { TransactionsList } from "@/components/payments/TransactionsList";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Transactions = () => {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Helmet>
-        <title>My Transactions | INFIWORLD</title>
-        <link rel="canonical" href="/my-transactions" />
-      </Helmet>
-      <AuthNavbar />
-      
-      <main className="container mx-auto p-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">บัญชีและธุรกรรมของฉัน</h1>
-        
-        <Tabs defaultValue="transactions">
-          <TabsList className="mb-6">
-            <TabsTrigger value="transactions">ธุรกรรมทั้งหมด</TabsTrigger>
-            <TabsTrigger value="escrow">Escrow</TabsTrigger>
-            <TabsTrigger value="refunds">การคืนเงิน</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="transactions">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">ยอดชำระเงินทั้งหมด</CardTitle>
-                  <CardDescription>รวมทุกประเภทธุรกรรม</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-3xl font-bold">฿0</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">ธุรกรรมที่รอดำเนินการ</CardTitle>
-                  <CardDescription>รอการยืนยันหรือดำเนินการ</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-3xl font-bold">0</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">การคืนเงิน</CardTitle>
-                  <CardDescription>ยอดรวมการคืนเงิน</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-3xl font-bold">฿0</p>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <TransactionsList />
-          </TabsContent>
-          
-          <TabsContent value="escrow">
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>บัญชี Escrow</CardTitle>
-                <CardDescription>
-                  บัญชี Escrow ช่วยปกป้องทั้งผู้ซื้อและผู้ขายในธุรกรรมมูลค่าสูง เช่น อสังหาริมทรัพย์และรถยนต์
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4">
-                  เมื่อคุณทำธุรกรรม Escrow ผู้ซื้อจะโอนเงินให้ INFIWORLD เพื่อเก็บไว้ในบัญชี Escrow 
-                  เมื่อผู้ซื้อได้รับสินค้าและยืนยันว่าถูกต้อง เงินจะถูกโอนให้ผู้ขาย ช่วยปกป้องทั้งสองฝ่าย
+  const { user } = useAuth();
+  const isMobile = useIsMobile();
+  const [activeTab, setActiveTab] = useState<string>("all");
+
+  useEffect(() => {
+    // Scroll to top when page loads
+    window.scrollTo(0, 0);
+  }, []);
+
+  if (!user) {
+    // Redirect to login or show message
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-2">
+                <h2 className="text-2xl font-bold">กรุณาเข้าสู่ระบบ</h2>
+                <p className="text-muted-foreground">
+                  คุณต้องเข้าสู่ระบบเพื่อดูประวัติธุรกรรมของคุณ
                 </p>
-                <div className="flex items-center gap-4 mt-4">
-                  <div className="text-center flex-1 p-4 border rounded-md bg-gray-50">
-                    <h3 className="font-medium text-lg">Escrow ที่รอดำเนินการ</h3>
-                    <p className="text-3xl font-bold mt-1">0</p>
-                  </div>
-                  
-                  <div className="text-center flex-1 p-4 border rounded-md bg-gray-50">
-                    <h3 className="font-medium text-lg">Escrow ที่สำเร็จแล้ว</h3>
-                    <p className="text-3xl font-bold mt-1">0</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <TransactionsList />
-          </TabsContent>
-          
-          <TabsContent value="refunds">
-            <Card className="mb-6">
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>ประวัติธุรกรรม | INFIWORLD</title>
+        <meta name="description" content="ดูประวัติธุรกรรมการเงินของคุณบน INFIWORLD" />
+        <meta name="keywords" content="INFIWORLD ชำระเงิน, ประวัติธุรกรรม, คริปโต, ธุรกรรมออนไลน์" />
+      </Helmet>
+
+      <Navbar />
+      <div className="flex-grow p-4 md:p-8 bg-gray-50">
+        <div className="container mx-auto max-w-7xl">
+          <h1 className="text-3xl font-bold mb-6">ประวัติธุรกรรม</h1>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>ธุรกรรมของฉัน</CardTitle>
+              <CardDescription>
+                รายละเอียดธุรกรรมการเงินทั้งหมดของบัญชีคุณ
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="mb-6">
+                  <TabsTrigger value="all">ทั้งหมด</TabsTrigger>
+                  <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
+                  <TabsTrigger value="freelance">Freelance</TabsTrigger>
+                  <TabsTrigger value="reservation">การจอง</TabsTrigger>
+                  <TabsTrigger value="escrow">Escrow</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="all">
+                  <TransactionsList />
+                </TabsContent>
+                
+                <TabsContent value="marketplace">
+                  <TransactionsList filterType="marketplace" />
+                </TabsContent>
+                
+                <TabsContent value="freelance">
+                  <TransactionsList filterType="freelance" />
+                </TabsContent>
+                
+                <TabsContent value="reservation">
+                  <TransactionsList filterType="reservation" />
+                </TabsContent>
+                
+                <TabsContent value="escrow">
+                  <TransactionsList showEscrowOnly={true} />
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
               <CardHeader>
-                <CardTitle>การขอคืนเงิน</CardTitle>
-                <CardDescription>
-                  กรณีเกิดปัญหากับธุรกรรม คุณสามารถขอคืนเงินได้ภายใน 7 วันหลังชำระเงิน
-                </CardDescription>
+                <CardTitle>คำถามที่พบบ่อย</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <p>
-                    นโยบายการคืนเงินของ INFIWORLD:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li>การชำระเงินด้วยบัตรเครดิตหรือเดบิต จะคืนเงินกลับไปยังบัตรเดิม</li>
-                    <li>การชำระเงินด้วยพร้อมเพย์หรือคริปโต อาจใช้เวลาดำเนินการ 3-5 วันทำการ</li>
-                    <li>การซื้อขายที่ใช้บัญชี Escrow ต้องได้รับการยินยอมจากทั้งสองฝ่าย</li>
-                  </ul>
-                  <p>
-                    หากมีข้อสงสัยเกี่ยวกับการขอคืนเงิน กรุณาติดต่อเจ้าหน้าที่ฝ่ายบริการลูกค้า
-                  </p>
-                  <Button variant="outline">ติดต่อฝ่ายสนับสนุน</Button>
+                  <div>
+                    <h3 className="font-medium">การขอคืนเงินทำอย่างไร?</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      คุณสามารถกดปุ่ม "ขอคืนเงิน" ในธุรกรรมที่มีสิทธิ์ขอคืนเงินได้ เราจะดำเนินการภายใน 3-5 วันทำการ
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Escrow คืออะไร?</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Escrow คือบริการพักเงินที่ช่วยให้การซื้อขายปลอดภัย เงินจะถูกโอนให้ผู้ขายเมื่อผู้ซื้อยืนยันว่าได้รับสินค้าหรือบริการแล้ว
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-medium">ทำไมไม่เห็นธุรกรรมล่าสุด?</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      ธุรกรรมใหม่อาจใช้เวลา 1-2 นาทีในการปรากฎในระบบ กรุณากดรีเฟรชหากต้องการดูข้อมูลล่าสุด
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
             
-            <TransactionsList />
-          </TabsContent>
-        </Tabs>
-      </main>
+            <Card>
+              <CardHeader>
+                <CardTitle>นโยบายการชำระเงิน</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-medium">วิธีการชำระเงินที่รองรับ</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      บัตรเครดิต/เดบิต, คริปโตเคอเรนซี่ (BTC, ETH, USDT), และ PromptPay
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-medium">ค่าธรรมเนียม</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      บัตรเครดิต/เดบิต: 3%<br />
+                      คริปโต: 1%<br />
+                      PromptPay: ฟรี<br />
+                      Escrow: 2%
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-medium">ความปลอดภัย</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      ระบบการชำระเงินของเราได้รับการรับรองตามมาตรฐาน PCI DSS และเข้ารหัสข้อมูลทั้งหมด
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+      <Footer />
     </div>
   );
 };
