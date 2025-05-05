@@ -1,213 +1,94 @@
 
-import { useState } from "react";
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
+import React from "react";
+import { usePaymentData } from "@/hooks/usePaymentData";
+import { TransactionCard } from "@/components/payments/TransactionCard";
+import { PaymentType } from "@/components/payments/types";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Eye, RefreshCcw, FileText } from "lucide-react";
-import { Transaction, TransactionsListProps } from "@/components/payments/types";
-import { cn } from "@/lib/utils";
-import { EscrowModal } from "@/components/payments/EscrowModal";
-import { 
-  getPaymentStatusBadge, 
-  getTransactionTypeDisplay, 
-  getPaymentMethodDisplay,
-  formatDate
-} from "@/components/payments/utils/formatUtils";
-import { usePaymentData } from "@/components/payments/hooks/usePaymentData";
+import { RefreshCcw } from "lucide-react";
 
-export function TransactionsList({ 
-  limit,
-  showRefreshButton = true,
-  className,
+interface TransactionsListProps {
+  filterType?: PaymentType;
+  showEscrowOnly?: boolean;
+  limit?: number;
+}
+
+/**
+ * Displays a list of transactions with optional filtering
+ */
+export const TransactionsList: React.FC<TransactionsListProps> = ({
   filterType,
-  showEscrowOnly = false
-}: TransactionsListProps) {
+  showEscrowOnly = false,
+  limit = 100
+}) => {
   const {
     transactions,
     isLoading,
     fetchTransactions,
     handleRequestRefund,
-    canRequestRefund,
-    canReleaseEscrow,
     user
-  } = usePaymentData(limit);
-  
-  const [escrowModalData, setEscrowModalData] = useState<{
-    open: boolean;
-    escrowId: string;
-    paymentId: string;
-    sellerName: string;
-    itemName: string;
-    amount: number;
-  }>({
-    open: false,
-    escrowId: "",
-    paymentId: "",
-    sellerName: "",
-    itemName: "",
-    amount: 0
+  } = usePaymentData({
+    initialLimit: limit,
+    filterType,
+    showEscrowOnly
   });
 
-  const handleOpenEscrowModal = (transaction: Transaction) => {
-    if (!transaction.escrow) return;
-    
-    // In a real app, we would fetch the seller name and item name
-    // For this demo, we'll use placeholders
-    const sellerName = "ผู้ขาย #" + transaction.escrow.sellerId.substring(0, 6);
-    const itemName = transaction.related_type === 'marketplace' 
-      ? "รายการใน Marketplace" 
-      : "บริการ";
-    
-    setEscrowModalData({
-      open: true,
-      escrowId: transaction.escrow.id!,
-      paymentId: transaction.id,
-      sellerName,
-      itemName,
-      amount: transaction.amount
-    });
+  // Handle escrow release - this would be implemented in a real application
+  const handleReleaseEscrow = (transactionId: string) => {
+    console.log("Releasing escrow for transaction:", transactionId);
+    // Implementation would go here
   };
 
-  // Filter transactions based on props
-  const filteredTransactions = transactions.filter(transaction => {
-    if (filterType && transaction.related_type !== filterType) {
-      return false;
-    }
-    if (showEscrowOnly && !transaction.escrow) {
-      return false;
-    }
-    return true;
-  });
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <Skeleton key={i} className="h-32 w-full rounded-lg" />
+        ))}
+      </div>
+    );
+  }
+
+  if (transactions.length === 0) {
+    return (
+      <div className="text-center py-8 bg-gray-50 rounded-lg">
+        <p className="text-infi-gray mb-2">ไม่พบข้อมูลธุรกรรม</p>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="mt-2"
+          onClick={() => fetchTransactions()}
+        >
+          <RefreshCcw className="mr-2 h-4 w-4" /> รีเฟรช
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <div className={cn("rounded-md border", className)}>
-        {showRefreshButton && (
-          <div className="flex justify-end p-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={fetchTransactions}
-              disabled={isLoading}
-              className="flex items-center gap-1"
-            >
-              <RefreshCcw className="h-4 w-4" />
-              รีเฟรช
-            </Button>
-          </div>
-        )}
-        
-        <Table>
-          <TableCaption>รายการธุรกรรมการเงินของคุณ</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>วันที่</TableHead>
-              <TableHead>ประเภท</TableHead>
-              <TableHead>จำนวนเงิน</TableHead>
-              <TableHead>วิธีชำระเงิน</TableHead>
-              <TableHead>สถานะ</TableHead>
-              <TableHead className="text-right">การดำเนินการ</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredTransactions.length === 0 && !isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
-                  ไม่พบข้อมูลธุรกรรม
-                </TableCell>
-              </TableRow>
-            ) : isLoading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
-                  <div className="flex justify-center items-center">
-                    <RefreshCcw className="h-6 w-6 animate-spin" />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredTransactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell className="font-medium">
-                    {formatDate(transaction.created_at)}
-                  </TableCell>
-                  <TableCell>{getTransactionTypeDisplay(transaction.related_type)}</TableCell>
-                  <TableCell>
-                    {transaction.amount.toLocaleString()} {transaction.currency}
-                    {transaction.escrow && (
-                      <Badge variant="outline" className="ml-2 text-amber-600">
-                        Escrow
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>{getPaymentMethodDisplay(transaction.payment_method)}</TableCell>
-                  <TableCell>{getPaymentStatusBadge(transaction.payment_status)}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      {transaction.receipt_url && (
-                        <Button variant="outline" size="sm" asChild>
-                          <a href={transaction.receipt_url} target="_blank" rel="noopener noreferrer">
-                            <Eye className="h-4 w-4 mr-1" /> ใบเสร็จ
-                          </a>
-                        </Button>
-                      )}
-                      
-                      {transaction.escrow && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleOpenEscrowModal(transaction)}
-                        >
-                          <FileText className="h-4 w-4 mr-1" /> สัญญา
-                        </Button>
-                      )}
-                      
-                      {canRequestRefund(transaction) && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleRequestRefund(transaction.id)}
-                        >
-                          ขอคืนเงิน
-                        </Button>
-                      )}
-                      
-                      {canReleaseEscrow(transaction) && (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="border-amber-600 text-amber-600 hover:bg-amber-50"
-                          onClick={() => handleOpenEscrowModal(transaction)}
-                        >
-                          ปล่อยเงิน Escrow
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">ธุรกรรมทั้งหมด {transactions.length} รายการ</h3>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => fetchTransactions()}
+        >
+          <RefreshCcw className="mr-2 h-4 w-4" /> รีเฟรช
+        </Button>
       </div>
       
-      <EscrowModal
-        open={escrowModalData.open}
-        onClose={() => setEscrowModalData({...escrowModalData, open: false})}
-        escrowId={escrowModalData.escrowId}
-        paymentId={escrowModalData.paymentId}
-        sellerName={escrowModalData.sellerName}
-        itemName={escrowModalData.itemName}
-        amount={escrowModalData.amount}
-        onSuccess={fetchTransactions}
-      />
-    </>
+      <div className="space-y-4">
+        {transactions.map((transaction) => (
+          <TransactionCard
+            key={transaction.id}
+            transaction={transaction}
+            onRequestRefund={handleRequestRefund}
+            onReleaseEscrow={showEscrowOnly ? handleReleaseEscrow : undefined}
+            userId={user?.id}
+          />
+        ))}
+      </div>
+    </div>
   );
-}
+};
