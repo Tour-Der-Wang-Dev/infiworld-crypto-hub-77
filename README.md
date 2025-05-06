@@ -1,73 +1,94 @@
-# Welcome to your Lovable project
+```markdown
+# Infiworld Crypto Hub 78 🌐
 
-## Project info
+## 🚀 Features
+- **Interactive UI**: พัฒนาโดยใช้ React, GSAP และ TailwindCSS เพื่อสร้าง UX ที่ลื่นไหล
+- **Responsive Design**: รองรับทุกอุปกรณ์
+- **High Performance**: โครงสร้างที่ปรับขยายง่ายและเน้นความเร็วในการโหลด
 
-**URL**: https://lovable.dev/projects/7c2bf093-8ab0-41fd-ab83-dd08896df6ad
+## 🛠️ Technologies
+- **TypeScript**: เพิ่มความปลอดภัยของโค้ด
+- **React**: โครงสร้างแบบ Component-based
+- **GSAP**: สำหรับสร้างแอนิเมชันที่ลื่นไหล
+- **TailwindCSS**: จัดการสไตล์อย่างรวดเร็วด้วย Utility-first
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/7c2bf093-8ab0-41fd-ab83-dd08896df6ad) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+## 🏗️ Project Structure
+```plaintext
+src/
+├── components/         # React components
+├── hooks/              # Custom hooks
+├── styles/             # TailwindCSS configs
+├── utils/              # Helper functions
+└── App.tsx             # Main entry point
 ```
 
-**Edit a file directly in GitHub**
+## 📦 Installation
+1. Clone โปรเจกต์:
+   ```bash
+   git clone https://github.com/Tour-Der-Wang-Dev/infiworld-crypto-hub-78.git
+   cd infiworld-crypto-hub-78
+   ```
+2. ติดตั้ง dependencies:
+   ```bash
+   npm install
+   ```
+3. รันโปรเจกต์:
+   ```bash
+   npm start
+   ```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🎨 GSAP + Tailwind Example
+```tsx
+import React, { useEffect } from 'react';
+import { gsap } from 'gsap';
 
-**Use GitHub Codespaces**
+const AnimatedButton: React.FC = () => {
+  useEffect(() => {
+    gsap.to('.button', {
+      duration: 1,
+      scale: 1.1,
+      repeat: -1,
+      yoyo: true,
+    });
+  }, []);
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+  return (
+    <button className="button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Hover Me
+    </button>
+  );
+};
 
-## What technologies are used for this project?
+export default AnimatedButton;
+```
 
-This project is built with:
+## 📄 License
+This project is licensed under the MIT License.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🙌 Contributing
+Contributions are welcome! โปรดอ่าน [CONTRIBUTING.md](CONTRIBUTING.md) สำหรับข้อมูลเพิ่มเติม
 
-## How can I deploy this project?
+## 📞 Contact
+หากมีคำถามหรือข้อสงสัย ติดต่อได้ที่: [kritsanan1](https://github.com/kritsanan1)
+```
 
-Simply open [Lovable](https://lovable.dev/projects/7c2bf093-8ab0-41fd-ab83-dd08896df6ad) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+### คำอธิบาย:
+1. **โครงสร้างชัดเจน**:
+   - แบ่งส่วน Features, Installation, และ Project Structure
+   - ทำให้ผู้อ่านเข้าใจโปรเจกต์ได้ทันที
 
-Yes, you can!
+2. **โค้ดตัวอย่าง**:
+   - แสดงการใช้งาน GSAP + TailwindCSS เพื่อสร้างปุ่มแบบ interactive
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+3. **เทคนิคเสริม**:
+   - ใช้ `useEffect` เพื่อควบคุมแอนิเมชัน
+   - เพิ่ม Section การติดตั้งเพื่อให้นักพัฒนาทำตามได้ง่าย
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+4. **Responsive**:
+   - ใช้ TailwindCSS classes ที่รองรับ responsive design
+
+### เทคนิคเสริม:
+- **เพิ่ม Badge** เช่น ![Build Status](https://img.shields.io/badge/build-passing-brightgreen) เพื่อแสดงสถานะโปรเจกต์
+- **เพิ่ม Screenshot** หรือ GIF Animation เพื่อแสดงตัวอย่างการใช้งาน
