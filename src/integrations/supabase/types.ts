@@ -9,90 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      escrow_transactions: {
-        Row: {
-          buyer_id: string
-          contract_details: Json | null
-          created_at: string
-          escrow_status: string
-          id: string
-          payment_id: string
-          release_conditions: string | null
-          release_date: string | null
-          seller_id: string
-          updated_at: string
-        }
-        Insert: {
-          buyer_id: string
-          contract_details?: Json | null
-          created_at?: string
-          escrow_status?: string
-          id?: string
-          payment_id: string
-          release_conditions?: string | null
-          release_date?: string | null
-          seller_id: string
-          updated_at?: string
-        }
-        Update: {
-          buyer_id?: string
-          contract_details?: Json | null
-          created_at?: string
-          escrow_status?: string
-          id?: string
-          payment_id?: string
-          release_conditions?: string | null
-          release_date?: string | null
-          seller_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "escrow_transactions_payment_id_fkey"
-            columns: ["payment_id"]
-            isOneToOne: false
-            referencedRelation: "payments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      favorites: {
-        Row: {
-          created_at: string | null
-          id: string
-          listing_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          listing_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          listing_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "favorites_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "favorites_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      infiworld: {
+      admin: {
         Row: {
           created_at: string
           id: number
@@ -107,202 +24,228 @@ export type Database = {
         }
         Relationships: []
       }
-      listing_views: {
+      bookings: {
         Row: {
-          id: string
-          listing_id: string
-          viewed_at: string | null
-          viewer_id: string | null
-        }
-        Insert: {
-          id?: string
-          listing_id: string
-          viewed_at?: string | null
-          viewer_id?: string | null
-        }
-        Update: {
-          id?: string
-          listing_id?: string
-          viewed_at?: string | null
-          viewer_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "listing_views_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "listing_views_viewer_id_fkey"
-            columns: ["viewer_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      listings: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          features: Json | null
-          id: string
-          images: string[] | null
-          is_rental: boolean | null
-          location: string
-          price: number
-          seller_id: string | null
-          status: string | null
-          title: string
-          type: string
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          features?: Json | null
-          id?: string
-          images?: string[] | null
-          is_rental?: boolean | null
-          location: string
-          price: number
-          seller_id?: string | null
-          status?: string | null
-          title: string
-          type: string
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          features?: Json | null
-          id?: string
-          images?: string[] | null
-          is_rental?: boolean | null
-          location?: string
-          price?: number
-          seller_id?: string | null
-          status?: string | null
-          title?: string
-          type?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "listings_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      payment_consents: {
-        Row: {
-          consent_version: string
-          consented_at: string
-          id: string
-          ip_address: string | null
-          user_id: string
-        }
-        Insert: {
-          consent_version?: string
-          consented_at?: string
-          id?: string
-          ip_address?: string | null
-          user_id: string
-        }
-        Update: {
-          consent_version?: string
-          consented_at?: string
-          id?: string
-          ip_address?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      payments: {
-        Row: {
-          amount: number
+          client_id: string
           created_at: string
-          currency: string
+          description: string | null
+          end_time: string
+          freelancer_id: string
+          hourly_rate: number
           id: string
-          payment_details: Json | null
-          payment_method: string
-          payment_status: string
-          receipt_url: string | null
-          refund_status: string | null
-          refunded_amount: number | null
-          related_id: string
-          related_type: string
+          start_time: string
+          status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          description?: string | null
+          end_time: string
+          freelancer_id: string
+          hourly_rate: number
+          id?: string
+          start_time: string
+          status?: string
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          description?: string | null
+          end_time?: string
+          freelancer_id?: string
+          hourly_rate?: number
+          id?: string
+          start_time?: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_freelancer_id_fkey"
+            columns: ["freelancer_id"]
+            isOneToOne: false
+            referencedRelation: "freelancers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      freelancer_skills: {
+        Row: {
+          freelancer_id: string
+          id: string
+          proficiency_level: string | null
+          skill_id: string
+        }
+        Insert: {
+          freelancer_id: string
+          id?: string
+          proficiency_level?: string | null
+          skill_id: string
+        }
+        Update: {
+          freelancer_id?: string
+          id?: string
+          proficiency_level?: string | null
+          skill_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "freelancer_skills_freelancer_id_fkey"
+            columns: ["freelancer_id"]
+            isOneToOne: false
+            referencedRelation: "freelancers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "freelancer_skills_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      freelancers: {
+        Row: {
+          availability_status: string | null
+          category: string
+          created_at: string
+          hourly_rate: number
+          id: string
+          is_verified: boolean | null
+          rating: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
-          amount: number
+          availability_status?: string | null
+          category: string
           created_at?: string
-          currency?: string
+          hourly_rate: number
           id?: string
-          payment_details?: Json | null
-          payment_method: string
-          payment_status?: string
-          receipt_url?: string | null
-          refund_status?: string | null
-          refunded_amount?: number | null
-          related_id: string
-          related_type: string
+          is_verified?: boolean | null
+          rating?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
-          amount?: number
+          availability_status?: string | null
+          category?: string
           created_at?: string
-          currency?: string
+          hourly_rate?: number
           id?: string
-          payment_details?: Json | null
-          payment_method?: string
-          payment_status?: string
-          receipt_url?: string | null
-          refund_status?: string | null
-          refunded_amount?: number | null
-          related_id?: string
-          related_type?: string
+          is_verified?: boolean | null
+          rating?: number | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "freelancers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      profiles: {
+      messages: {
         Row: {
-          created_at: string | null
-          first_name: string | null
+          content: string
+          created_at: string
           id: string
-          last_name: string | null
-          payment_consent_status: string | null
-          phone: string | null
-          profile_image: string | null
-          role: string | null
+          is_read: boolean | null
+          receiver_id: string
+          sender_id: string
         }
         Insert: {
-          created_at?: string | null
-          first_name?: string | null
-          id: string
-          last_name?: string | null
-          payment_consent_status?: string | null
-          phone?: string | null
-          profile_image?: string | null
-          role?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          receiver_id: string
+          sender_id: string
         }
         Update: {
-          created_at?: string | null
-          first_name?: string | null
+          content?: string
+          created_at?: string
           id?: string
-          last_name?: string | null
-          payment_consent_status?: string | null
-          phone?: string | null
-          profile_image?: string | null
-          role?: string | null
+          is_read?: boolean | null
+          receiver_id?: string
+          sender_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "messages_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          booking_id: string
+          created_at: string
+          currency: string | null
+          id: string
+          payment_method: string
+          status: string
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          booking_id: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          payment_method: string
+          status: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          booking_id?: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          payment_method?: string
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reservations: {
         Row: {
@@ -313,11 +256,13 @@ export type Database = {
           departure_date: string
           destination: string
           id: string
+          payment_intent: string | null
           price: number
-          provider: string
+          provider: string | null
           return_date: string | null
           status: string
           type: string
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
@@ -328,11 +273,13 @@ export type Database = {
           departure_date: string
           destination: string
           id?: string
+          payment_intent?: string | null
           price: number
-          provider: string
+          provider?: string | null
           return_date?: string | null
           status?: string
           type: string
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
@@ -343,62 +290,79 @@ export type Database = {
           departure_date?: string
           destination?: string
           id?: string
+          payment_intent?: string | null
           price?: number
-          provider?: string
+          provider?: string | null
           return_date?: string | null
           status?: string
           type?: string
+          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
       }
       reviews: {
         Row: {
+          booking_id: string
           comment: string | null
-          created_at: string | null
+          created_at: string
           id: string
           rating: number
-          reviewer_id: string | null
-          store_id: string
+          reviewer_id: string
         }
         Insert: {
+          booking_id: string
           comment?: string | null
-          created_at?: string | null
+          created_at?: string
           id?: string
           rating: number
-          reviewer_id?: string | null
-          store_id: string
+          reviewer_id: string
         }
         Update: {
+          booking_id?: string
           comment?: string | null
-          created_at?: string | null
+          created_at?: string
           id?: string
           rating?: number
-          reviewer_id?: string | null
-          store_id?: string
+          reviewer_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reviews_reviewer_id_fkey"
             columns: ["reviewer_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: false
-            referencedRelation: "stores"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
+      }
+      skills: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
+        }
+        Relationships: []
       }
       stores: {
         Row: {
           accepted_crypto: string[]
           address: string
-          category: string | null
+          category: string
           created_at: string | null
           id: string
           latitude: number
@@ -406,12 +370,13 @@ export type Database = {
           name: string
           opening_hours: string | null
           phone: string | null
+          updated_at: string | null
           website: string | null
         }
         Insert: {
-          accepted_crypto?: string[]
+          accepted_crypto: string[]
           address: string
-          category?: string | null
+          category: string
           created_at?: string | null
           id?: string
           latitude: number
@@ -419,12 +384,13 @@ export type Database = {
           name: string
           opening_hours?: string | null
           phone?: string | null
+          updated_at?: string | null
           website?: string | null
         }
         Update: {
           accepted_crypto?: string[]
           address?: string
-          category?: string | null
+          category?: string
           created_at?: string | null
           id?: string
           latitude?: number
@@ -432,102 +398,64 @@ export type Database = {
           name?: string
           opening_hours?: string | null
           phone?: string | null
+          updated_at?: string | null
           website?: string | null
         }
         Relationships: []
       }
-      transactions: {
+      table_name: {
         Row: {
-          amount: number
-          buyer_id: string | null
-          created_at: string | null
-          currency: string | null
-          id: string
-          listing_id: string | null
-          payment_details: Json | null
-          payment_method: string | null
-          seller_id: string | null
-          status: string | null
+          data: Json | null
+          id: number
+          inserted_at: string
+          name: string | null
+          updated_at: string
         }
         Insert: {
-          amount: number
-          buyer_id?: string | null
-          created_at?: string | null
-          currency?: string | null
-          id?: string
-          listing_id?: string | null
-          payment_details?: Json | null
-          payment_method?: string | null
-          seller_id?: string | null
-          status?: string | null
+          data?: Json | null
+          id?: number
+          inserted_at?: string
+          name?: string | null
+          updated_at?: string
         }
         Update: {
-          amount?: number
-          buyer_id?: string | null
-          created_at?: string | null
-          currency?: string | null
-          id?: string
-          listing_id?: string | null
-          payment_details?: Json | null
-          payment_method?: string | null
-          seller_id?: string | null
-          status?: string | null
+          data?: Json | null
+          id?: number
+          inserted_at?: string
+          name?: string | null
+          updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "transactions_buyer_id_fkey"
-            columns: ["buyer_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transactions_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transactions_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      user_preferences: {
+      users: {
         Row: {
-          currency: string | null
+          bio: string | null
+          created_at: string
+          email: string
+          full_name: string
           id: string
-          language: string | null
-          notification_settings: Json | null
-          user_id: string
+          profile_image_url: string | null
+          updated_at: string
         }
         Insert: {
-          currency?: string | null
+          bio?: string | null
+          created_at?: string
+          email: string
+          full_name: string
           id?: string
-          language?: string | null
-          notification_settings?: Json | null
-          user_id: string
+          profile_image_url?: string | null
+          updated_at?: string
         }
         Update: {
-          currency?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
           id?: string
-          language?: string | null
-          notification_settings?: Json | null
-          user_id?: string
+          profile_image_url?: string | null
+          updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_preferences_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       verifications: {
         Row: {
@@ -537,7 +465,8 @@ export type Database = {
           id: string
           rejection_reason: string | null
           status: string
-          user_id: string
+          updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -546,7 +475,8 @@ export type Database = {
           id?: string
           rejection_reason?: string | null
           status?: string
-          user_id: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -555,7 +485,8 @@ export type Database = {
           id?: string
           rejection_reason?: string | null
           status?: string
-          user_id?: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -564,10 +495,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      is_admin: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
