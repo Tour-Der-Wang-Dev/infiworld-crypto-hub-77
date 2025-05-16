@@ -63,12 +63,6 @@ const mockTransactionData = [
   }
 ];
 
-// Mock Jest globally
-global.describe = jest.fn() as any;
-global.it = jest.fn() as any;
-global.beforeEach = jest.fn() as any;
-global.expect = jest.fn() as any;
-
 // Tests for payment utilities
 describe('Payment Utilities', () => {
   describe('formatTransactionData', () => {

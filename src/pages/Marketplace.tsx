@@ -24,6 +24,34 @@ interface Listing {
   status: string;
 }
 
+type ErrorWithMessage = {
+  message: string;
+}
+
+function isErrorWithMessage(error: unknown): error is ErrorWithMessage {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as Record<string, unknown>).message === 'string'
+  );
+}
+
+function toErrorWithMessage(error: unknown): ErrorWithMessage {
+  if (isErrorWithMessage(error)) return error;
+  
+  try {
+    return new Error(
+      error instanceof Error 
+        ? error.message 
+        : JSON.stringify(error)
+    );
+  } catch {
+    // Fallback in case JSON.stringify fails
+    return new Error('Unknown error occurred');
+  }
+}
+
 const Marketplace = () => {
   const [listingType, setListingType] = useState<ListingType>("all");
   const [priceRange, setPriceRange] = useState<PriceRange>("all");
@@ -82,11 +110,13 @@ const Marketplace = () => {
         
         setFilteredListings(formattedListings);
       }
-    } catch (error) {
-      console.error('Error fetching listings:', error);
+    } catch (error: unknown) {
+      const errorWithMessage = toErrorWithMessage(error);
+      console.error('Error fetching listings:', errorWithMessage);
+      
       toast({
-        title: "Error fetching listings",
-        description: "Please try again later",
+        title: "ไม่สามารถดึงข้อมูลรายการได้",
+        description: errorWithMessage.message || "กรุณาลองอีกครั้งในภายหลัง",
         variant: "destructive",
       });
     } finally {

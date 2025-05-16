@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PaymentType } from "@/components/payments/types";
+import { PaymentType, PAYMENT_TYPE_LABELS } from "@/constants/paymentTypes";
 import { AlertCircle, CreditCard, Wallet } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -20,7 +20,7 @@ const Payment = () => {
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [activeTab, setActiveTab] = useState("demo");
   const [paymentAmount, setPaymentAmount] = useState(1000);
-  const [paymentType, setPaymentType] = useState<PaymentType>("marketplace");
+  const [paymentType, setPaymentType] = useState<PaymentType>(PaymentType.MARKETPLACE);
   
   const { processPayment, isProcessing } = usePayment({
     onSuccess: () => {
@@ -171,9 +171,11 @@ const Payment = () => {
                               value={paymentType}
                               onChange={(e) => setPaymentType(e.target.value as PaymentType)}
                             >
-                              <option value="marketplace">สินค้า Marketplace</option>
-                              <option value="freelance">บริการฟรีแลนซ์</option>
-                              <option value="reservation">การจอง</option>
+                              {Object.values(PaymentType).map((type) => (
+                                <option key={type} value={type}>
+                                  {PAYMENT_TYPE_LABELS[type as PaymentType]}
+                                </option>
+                              ))}
                             </select>
                           </div>
                           
