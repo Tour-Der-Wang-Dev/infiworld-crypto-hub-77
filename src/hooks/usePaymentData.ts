@@ -1,6 +1,5 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Transaction, PaymentType } from "@/components/payments/types";
@@ -43,37 +42,37 @@ export const usePaymentData = ({
       console.log("Show escrow only:", showEscrowOnly);
       
       // Instead of real data, we'll create mock data to simulate the response
-      // In a real implementation, we would make the actual query to Supabase
-      setTimeout(() => {
-        const mockData = [
-          {
-            id: `pay-${Date.now()}-1`,
-            amount: 1000,
-            currency: "THB",
-            payment_method: "card",
-            status: "completed",
-            related_type: filterType || PaymentType.MARKETPLACE,
-            related_id: "mock-item-1",
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            receipt_url: null,
-            refund_status: null,
-            refunded_amount: null,
-            escrow_transactions: showEscrowOnly ? [{
-              id: `escrow-${Date.now()}-1`,
-              payment_id: `pay-${Date.now()}-1`,
-              buyer_id: user.id,
-              seller_id: "seller-1",
-              escrow_status: "initiated",
-              contract_details: { item: "Product 1" },
-              release_conditions: "Product delivery",
-              release_date: null
-            }] : []
-          }
-        ];
+      const mockData = [
+        {
+          id: `pay-${Date.now()}-1`,
+          amount: 1000,
+          currency: "THB",
+          payment_method: "card",
+          payment_status: "completed",
+          related_type: filterType || "marketplace",
+          related_id: "mock-item-1",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          receipt_url: null,
+          refund_status: null,
+          refunded_amount: null,
+          escrow_transactions: showEscrowOnly ? [{
+            id: `escrow-${Date.now()}-1`,
+            payment_id: `pay-${Date.now()}-1`,
+            buyer_id: user.id,
+            seller_id: "seller-1",
+            escrow_status: "initiated",
+            contract_details: { item: "Product 1" },
+            release_conditions: "Product delivery",
+            release_date: null
+          }] : []
+        }
+      ];
 
+      // Use timeout to simulate API call
+      setTimeout(() => {
         // Process and set transaction data
-        const formattedData = formatTransactionData(mockData || []);
+        const formattedData = formatMockTransactions(mockData);
         setTransactions(formattedData);
         setIsLoading(false);
       }, 500);
@@ -85,7 +84,48 @@ export const usePaymentData = ({
       });
       setIsLoading(false);
     }
-  }, [user, initialLimit, filterType, showEscrowOnly]);
+  }, [user, filterType, showEscrowOnly]);
+
+  // Format mock transaction data
+  const formatMockTransactions = (data: any[]): Transaction[] => {
+    if (!data) return [];
+    
+    try {
+      return data.map((item): Transaction => {
+        const escrow = item.escrow_transactions && item.escrow_transactions.length > 0 
+          ? item.escrow_transactions[0] 
+          : undefined;
+        
+        return {
+          id: item.id,
+          amount: item.amount,
+          currency: item.currency,
+          payment_method: item.payment_method,
+          payment_status: item.payment_status,
+          related_type: item.related_type as PaymentType,
+          related_id: item.related_id,
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          receipt_url: item.receipt_url,
+          refund_status: item.refund_status,
+          refunded_amount: item.refunded_amount,
+          escrow: escrow ? {
+            id: escrow.id,
+            paymentId: escrow.payment_id,
+            buyerId: escrow.buyer_id,
+            sellerId: escrow.seller_id,
+            status: escrow.escrow_status,
+            contractDetails: escrow.contract_details,
+            releaseConditions: escrow.release_conditions,
+            releaseDate: escrow.release_date ? new Date(escrow.release_date) : undefined
+          } : undefined
+        };
+      });
+    } catch (error) {
+      console.error("Error formatting mock transaction data:", error);
+      return [];
+    }
+  };
 
   /**
    * Handle requesting a refund for a transaction

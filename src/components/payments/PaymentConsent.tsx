@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -27,9 +26,7 @@ export const PaymentConsent = ({ onConsentChange }: PaymentConsentProps) => {
     
     if (checked) {
       try {
-        // Since payment_consents table doesn't exist, we'll just simulate success for now
-        // In a real implementation, we'd need to create these tables first
-        // via SQL migrations before accessing them
+        // Since payment_consents table doesn't exist, we'll just simulate success
         console.log("Recording consent for user:", user.id);
         
         // Simulate processing time
