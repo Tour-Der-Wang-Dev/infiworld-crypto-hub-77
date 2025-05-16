@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom'; // Add this import to fix toBeInTheDocument errors
 import { UserProfile } from '../UserProfile';
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";

@@ -30,6 +30,10 @@ export const PaymentConsent = ({ onConsentChange }: PaymentConsentProps) => {
         // Since payment_consents table doesn't exist, we'll just simulate success for now
         // In a real implementation, we'd need to create these tables first
         // via SQL migrations before accessing them
+        console.log("Recording consent for user:", user.id);
+        
+        // Simulate processing time
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         setHasConsented(true);
         onConsentChange(true);

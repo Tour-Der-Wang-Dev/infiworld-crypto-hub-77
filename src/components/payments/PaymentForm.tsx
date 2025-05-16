@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -12,6 +11,7 @@ import { PaymentConsent } from "@/components/payments/PaymentConsent";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Label } from "@/components/ui/label";
 import { formatCurrency } from "./utils/formatUtils";
 import { PaymentType } from "./types";
 import { CreditCard, Wallet, QrCode, AlertCircle, Check } from "lucide-react";
