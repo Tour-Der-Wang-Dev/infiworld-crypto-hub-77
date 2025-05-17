@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_URL } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -88,7 +88,7 @@ export const SupabaseConnectionCheck = () => {
       {connectionStatus === 'connected' && (
         <div className="space-y-2">
           <div>
-            <span className="font-medium">Project URL:</span> {"https://vpzhincrxgxyyzulmrzs.supabase.co"}
+            <span className="font-medium">Project URL:</span> {SUPABASE_URL}
           </div>
           <div>
             <span className="font-medium">Auth Status:</span> {authEnabled === true ? 'Enabled' : authEnabled === false ? 'Disabled' : 'Unknown'}
