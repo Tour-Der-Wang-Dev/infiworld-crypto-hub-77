@@ -17,15 +17,15 @@ export const EscrowInfoCard = () => {
           
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="p-3 border rounded-lg">
-              <div className="text-infi-green font-semibold mb-1">ขั้นตอนที่ 1</div>
+              <div className="text-green-600 font-semibold mb-1">ขั้นตอนที่ 1</div>
               <p className="text-sm">ผู้ซื้อชำระเงิน เข้าระบบ Escrow</p>
             </div>
             <div className="p-3 border rounded-lg">
-              <div className="text-infi-green font-semibold mb-1">ขั้นตอนที่ 2</div>
+              <div className="text-green-600 font-semibold mb-1">ขั้นตอนที่ 2</div>
               <p className="text-sm">ผู้ขายส่งมอบสินค้าหรือบริการ</p>
             </div>
             <div className="p-3 border rounded-lg">
-              <div className="text-infi-green font-semibold mb-1">ขั้นตอนที่ 3</div>
+              <div className="text-green-600 font-semibold mb-1">ขั้นตอนที่ 3</div>
               <p className="text-sm">ผู้ซื้อกดปล่อยเงินให้ผู้ขาย</p>
             </div>
           </div>

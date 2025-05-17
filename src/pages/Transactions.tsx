@@ -7,11 +7,10 @@ import Footer from "@/components/layout/Footer";
 import { TransactionsList } from "@/components/payments/TransactionsList";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { PaymentType } from "@/components/payments/types";
 
 const Transactions = () => {
   const { user } = useAuth();
-  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<string>("all");
 
   useEffect(() => {

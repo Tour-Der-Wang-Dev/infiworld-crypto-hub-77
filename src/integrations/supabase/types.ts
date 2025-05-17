@@ -81,6 +81,53 @@ export type Database = {
           },
         ]
       }
+      escrow_transactions: {
+        Row: {
+          buyer_id: string
+          contract_details: Json | null
+          created_at: string
+          escrow_status: Database["public"]["Enums"]["escrow_status"]
+          id: string
+          payment_id: string
+          release_conditions: string | null
+          release_date: string | null
+          seller_id: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          contract_details?: Json | null
+          created_at?: string
+          escrow_status?: Database["public"]["Enums"]["escrow_status"]
+          id?: string
+          payment_id: string
+          release_conditions?: string | null
+          release_date?: string | null
+          seller_id: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          contract_details?: Json | null
+          created_at?: string
+          escrow_status?: Database["public"]["Enums"]["escrow_status"]
+          id?: string
+          payment_id?: string
+          release_conditions?: string | null
+          release_date?: string | null
+          seller_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escrow_transactions_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       freelancer_skills: {
         Row: {
           freelancer_id: string
@@ -199,6 +246,77 @@ export type Database = {
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_consents: {
+        Row: {
+          consent_type: string
+          consented_at: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          consent_type: string
+          consented_at?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          consent_type?: string
+          consented_at?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payment_notifications: {
+        Row: {
+          channel: string
+          content: Json | null
+          created_at: string
+          id: string
+          notification_type: string
+          recipient_id: string
+          sent_at: string | null
+          status: string
+          transaction_id: string
+        }
+        Insert: {
+          channel: string
+          content?: Json | null
+          created_at?: string
+          id?: string
+          notification_type: string
+          recipient_id: string
+          sent_at?: string | null
+          status?: string
+          transaction_id: string
+        }
+        Update: {
+          channel?: string
+          content?: Json | null
+          created_at?: string
+          id?: string
+          notification_type?: string
+          recipient_id?: string
+          sent_at?: string | null
+          status?: string
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_notifications_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
             referencedColumns: ["id"]
           },
         ]
@@ -427,6 +545,54 @@ export type Database = {
         }
         Relationships: []
       }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          receipt_url: string | null
+          refund_status: string | null
+          refunded_amount: number | null
+          related_id: string
+          related_type: Database["public"]["Enums"]["payment_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          receipt_url?: string | null
+          refund_status?: string | null
+          refunded_amount?: number | null
+          related_id: string
+          related_type: Database["public"]["Enums"]["payment_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          receipt_url?: string | null
+          refund_status?: string | null
+          refunded_amount?: number | null
+          related_id?: string
+          related_type?: Database["public"]["Enums"]["payment_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           bio: string | null
@@ -498,7 +664,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      escrow_status: "initiated" | "released" | "refunded" | "disputed"
+      payment_method: "card" | "crypto" | "promptpay"
+      payment_status:
+        | "pending"
+        | "completed"
+        | "failed"
+        | "refunded"
+        | "partially_refunded"
+      payment_type: "marketplace" | "freelance" | "reservation"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -613,6 +787,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      escrow_status: ["initiated", "released", "refunded", "disputed"],
+      payment_method: ["card", "crypto", "promptpay"],
+      payment_status: [
+        "pending",
+        "completed",
+        "failed",
+        "refunded",
+        "partially_refunded",
+      ],
+      payment_type: ["marketplace", "freelance", "reservation"],
+    },
   },
 } as const

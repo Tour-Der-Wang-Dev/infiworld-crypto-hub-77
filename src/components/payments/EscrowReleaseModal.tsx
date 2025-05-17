@@ -4,24 +4,26 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { formatCurrency } from "@/components/payments/utils/formatUtils";
+import { formatCurrency } from "./utils/formatUtils";
 import { AlertCircle, CheckCircle, Wallet } from "lucide-react";
 
 interface EscrowReleaseModalProps {
   open: boolean;
   onClose: () => void;
   transactionId: string;
+  escrowId: string;
   sellerName?: string;
   itemDetails?: string;
   amount: number;
   currency?: string;
-  onConfirm: (transactionId: string) => Promise<void>;
+  onConfirm: () => Promise<void>;
 }
 
 export const EscrowReleaseModal = ({
   open,
   onClose,
   transactionId,
+  escrowId,
   sellerName = "ผู้ขาย",
   itemDetails = "สินค้า/บริการ",
   amount,
@@ -36,7 +38,7 @@ export const EscrowReleaseModal = ({
     
     setIsProcessing(true);
     try {
-      await onConfirm(transactionId);
+      await onConfirm();
       onClose();
     } catch (error) {
       console.error("Error in escrow release:", error);

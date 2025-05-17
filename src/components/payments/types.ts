@@ -1,14 +1,20 @@
 
 export type PaymentType = 'marketplace' | 'freelance' | 'reservation';
+export type PaymentMethod = 'card' | 'crypto' | 'promptpay';
+export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded' | 'partially_refunded';
+export type EscrowStatus = 'initiated' | 'released' | 'refunded' | 'disputed';
 
 export interface PaymentDetails {
   id?: string;
   amount: number;
   currency?: string;
-  paymentMethod?: string;
-  relatedType: PaymentType;
+  method: PaymentMethod;
+  paymentType: PaymentType;
   relatedId: string;
-  status?: string;
+  status?: PaymentStatus;
+  receiptUrl?: string;
+  refundStatus?: string;
+  refundedAmount?: number;
 }
 
 export interface EscrowDetails {
@@ -16,7 +22,7 @@ export interface EscrowDetails {
   paymentId: string;
   buyerId: string;
   sellerId: string;
-  status?: string;
+  status: EscrowStatus;
   contractDetails?: any;
   releaseConditions?: string;
   releaseDate?: Date;
@@ -26,8 +32,8 @@ export interface Transaction {
   id: string;
   amount: number;
   currency: string;
-  payment_method: string;
-  payment_status: string;
+  payment_method: PaymentMethod;
+  payment_status: PaymentStatus;
   related_type: PaymentType; 
   related_id: string;
   created_at: string;
@@ -42,37 +48,16 @@ export interface PaymentConsentProps {
   onConsentChange: (consented: boolean) => void;
 }
 
-export interface PaymentModalProps {
-  open: boolean;
-  onClose: () => void;
+export interface PaymentFormProps {
   amount: number;
   currency?: string;
   paymentType: PaymentType;
   relatedId: string;
   onSuccess?: (paymentId: string) => void;
+  onError?: (error: any) => void;
   useEscrow?: boolean;
   sellerId?: string;
-}
-
-export interface PaymentMethodsProps {
-  amount: number;
-  currency?: string;
-  onPaymentSubmit: (method: string) => Promise<void>;
-  onCancel: () => void;
-  isProcessing: boolean;
-  paymentType: PaymentType;
-}
-
-export interface EscrowModalProps {
-  open: boolean;
-  onClose: () => void;
-  escrowId: string;
-  paymentId: string;
-  sellerName: string;
-  itemName: string;
-  amount: number;
-  currency?: string;
-  onSuccess?: () => void;
+  buttonText?: string;
 }
 
 export interface TransactionsListProps {

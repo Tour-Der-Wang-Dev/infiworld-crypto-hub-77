@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PaymentConsentProps {
   onConsentChange: (consented: boolean) => void;
@@ -26,11 +27,15 @@ export const PaymentConsent = ({ onConsentChange }: PaymentConsentProps) => {
     
     if (checked) {
       try {
-        // Since payment_consents table doesn't exist, we'll just simulate success
-        console.log("Recording consent for user:", user.id);
-        
-        // Simulate processing time
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Record consent in the database
+        const { error } = await supabase
+          .from("payment_consents")
+          .insert({
+            user_id: user.id,
+            consent_type: "payment_processing",
+          });
+
+        if (error) throw error;
         
         setHasConsented(true);
         onConsentChange(true);
