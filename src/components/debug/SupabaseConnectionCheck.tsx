@@ -16,21 +16,21 @@ export const SupabaseConnectionCheck = () => {
     setError(null);
     
     try {
-      // Test basic connection by getting server time
+      // Test basic connection by getting server timestamp
       const { data: timeData, error: timeError } = await supabase.rpc('get_server_time');
       
       if (timeError) throw timeError;
       
       // Get list of tables we have access to
-      // Instead of querying pg_catalog, we'll check specific tables we know exist
-      const tables = ['users', 'payments', 'reservations', 'stores'];
+      // Check specific tables we know exist in the database schema
+      const tablesToCheck = ['users', 'payments', 'reservations', 'stores'];
       const availableTables: string[] = [];
       
-      for (const tableName of tables) {
+      for (const tableName of tablesToCheck) {
         try {
           // Just see if we can select a single row from each table
           const { error } = await supabase
-            .from(tableName)
+            .from(tableName as any)
             .select('id')
             .limit(1);
           
@@ -85,7 +85,7 @@ export const SupabaseConnectionCheck = () => {
       {connectionStatus === 'connected' && (
         <div className="space-y-2">
           <div>
-            <span className="font-medium">Project ID:</span> {supabase.supabaseUrl.split('//')[1]?.split('.')[0] || 'Unknown'}
+            <span className="font-medium">Project URL:</span> {supabase.supabaseUrl}
           </div>
           <div>
             <span className="font-medium">Auth Status:</span> {authEnabled === true ? 'Enabled' : authEnabled === false ? 'Disabled' : 'Unknown'}

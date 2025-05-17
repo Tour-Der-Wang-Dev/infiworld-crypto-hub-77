@@ -1,120 +1,77 @@
 
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 
-const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
-const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-const frontendDomain = Deno.env.get('FRONTEND_DOMAIN') ?? '*';
-
-// Use environment variable for CORS domain with fallback to wildcard
+// Define corsHeaders with environment variable for origin restriction
 const corsHeaders = {
-  'Access-Control-Allow-Origin': frontendDomain,
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
-const supabaseClient = createClient(supabaseUrl, supabaseServiceRoleKey);
-
-interface PaymentRequest {
-  amount: number;
-  currency: string;
-  method: 'card' | 'crypto' | 'promptpay';
-  paymentType: string;
-  relatedId: string;
-  useEscrow?: boolean;
-  sellerId?: string;
+  "Access-Control-Allow-Origin": Deno.env.get("FRONTEND_DOMAIN") || "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 }
 
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders, status: 204 });
-  }
+// Handle OPTIONS requests for CORS preflight
+const handleOptionsRequest = () => {
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders,
+  })
+}
 
+// Process the payment
+const processPayment = async (req: Request) => {
   try {
-    // Get the payment details from the request
-    const paymentData: PaymentRequest = await req.json();
-    
-    // Validate request body
-    if (!paymentData.amount || !paymentData.method || !paymentData.paymentType || !paymentData.relatedId) {
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'Missing required payment information' 
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400 
-        }
-      );
-    }
+    const { amount, currency, method, paymentType, relatedId, useEscrow, sellerId } = await req.json()
 
-    // Validate escrow usage
-    if (paymentData.useEscrow && !paymentData.sellerId) {
+    // Validate required fields
+    if (!amount || !method || !paymentType || !relatedId) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Seller ID is required for escrow payments'
+          error: "Missing required fields",
         }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400
-        }
-      );
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      )
     }
+
+    // Here would be the actual payment processing logic
+    // For now, we'll simulate success
+
+    // Create response with payment ID to simulate successful payment
+    const paymentId = `pay_${Date.now()}`
     
-    // Get the user from the auth token
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'Missing authorization header' 
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401 
-        }
-      );
-    }
-    
-    // Process the payment (this is a simulation)
-    console.log('Processing payment:', paymentData);
-    
-    // In a real implementation, you would call a payment gateway API here
-    // For simulation, we'll just create a transaction record
-    
-    // Simulate successful payment
-    const paymentId = `payment_${Date.now()}`;
-    
-    // Return success response
     return new Response(
       JSON.stringify({
         success: true,
-        paymentId: paymentId,
-        amount: paymentData.amount,
-        currency: paymentData.currency,
-        method: paymentData.method,
-        receiptUrl: `https://example.com/receipts/${paymentId}`
+        paymentId,
+        receiptUrl: `https://example.com/receipts/${paymentId}`,
       }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200
-      }
-    );
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+    )
   } catch (error) {
-    console.error('Payment processing error:', error);
-    
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message || 'Unknown error occurred'
+        error: error.message,
       }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
-      }
-    );
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+    )
   }
-});
+}
+
+// Request handler
+serve(async (req) => {
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return handleOptionsRequest()
+  }
+
+  // Process payment requests
+  if (req.method === "POST") {
+    return processPayment(req)
+  }
+
+  // Return 405 for unsupported methods
+  return new Response(
+    JSON.stringify({ error: "Method not allowed" }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 405 }
+  )
+})
