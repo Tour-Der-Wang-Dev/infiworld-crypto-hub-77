@@ -92,7 +92,7 @@ export const usePaymentData = ({
     
     try {
       return data.map((item): Transaction => {
-        const escrow = item.escrow_transactions && item.escrow_transactions.length > 0 
+        const escrowData = item.escrow_transactions && item.escrow_transactions.length > 0 
           ? item.escrow_transactions[0] 
           : undefined;
         
@@ -109,15 +109,15 @@ export const usePaymentData = ({
           receipt_url: item.receipt_url,
           refund_status: item.refund_status,
           refunded_amount: item.refunded_amount,
-          escrow: escrow ? {
-            id: escrow.id,
-            paymentId: escrow.payment_id,
-            buyerId: escrow.buyer_id,
-            sellerId: escrow.seller_id,
-            status: escrow.escrow_status,
-            contractDetails: escrow.contract_details,
-            releaseConditions: escrow.release_conditions,
-            releaseDate: escrow.release_date ? new Date(escrow.release_date) : undefined
+          escrow: escrowData ? {
+            id: escrowData.id,
+            paymentId: escrowData.payment_id,
+            buyerId: escrowData.buyer_id,
+            sellerId: escrowData.seller_id,
+            status: escrowData.escrow_status,
+            contractDetails: escrowData.contract_details,
+            releaseConditions: escrowData.release_conditions,
+            releaseDate: escrowData.release_date ? new Date(escrowData.release_date) : undefined
           } : undefined
         };
       });

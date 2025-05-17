@@ -21,18 +21,30 @@ export const SupabaseConnectionCheck = () => {
       
       if (timeError) throw timeError;
       
-      // Get list of tables to check metadata access
-      const { data: tablesData, error: tablesError } = await supabase
-        .from('pg_catalog.pg_tables')
-        .select('tablename')
-        .eq('schemaname', 'public');
+      // Get list of tables we have access to
+      // Instead of querying pg_catalog, we'll check specific tables we know exist
+      const tables = ['users', 'payments', 'reservations', 'stores'];
+      const availableTables: string[] = [];
       
-      if (tablesError) {
-        console.log('Tables access error (expected for non-admin users):', tablesError);
-        // This might fail due to RLS, which is actually good
-      } else if (tablesData) {
-        setDbTables(tablesData.map(t => t.tablename));
+      for (const tableName of tables) {
+        try {
+          // Just see if we can select a single row from each table
+          const { error } = await supabase
+            .from(tableName)
+            .select('id')
+            .limit(1);
+          
+          // If no error or only a permission error but table exists
+          if (!error || error.code === "PGRST116") {
+            availableTables.push(tableName);
+          }
+        } catch (err) {
+          // Ignore errors for individual tables
+          console.log(`Table check error for ${tableName}:`, err);
+        }
       }
+      
+      setDbTables(availableTables);
       
       // Check if auth is configured
       const { data: authData, error: authError } = await supabase.auth.getSession();
@@ -58,7 +70,7 @@ export const SupabaseConnectionCheck = () => {
     <div className="space-y-4 p-4 border rounded-lg">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Supabase Connection Status</h3>
-        <Badge variant={connectionStatus === 'connected' ? 'success' : connectionStatus === 'checking' ? 'outline' : 'destructive'}>
+        <Badge variant={connectionStatus === 'connected' ? 'secondary' : connectionStatus === 'checking' ? 'outline' : 'destructive'}>
           {connectionStatus === 'connected' ? 'Connected' : connectionStatus === 'checking' ? 'Checking...' : 'Error'}
         </Badge>
       </div>
@@ -73,7 +85,7 @@ export const SupabaseConnectionCheck = () => {
       {connectionStatus === 'connected' && (
         <div className="space-y-2">
           <div>
-            <span className="font-medium">Project ID:</span> {supabase.supabaseUrl.split('//')[1].split('.')[0]}
+            <span className="font-medium">Project ID:</span> {supabase.supabaseUrl.split('//')[1]?.split('.')[0] || 'Unknown'}
           </div>
           <div>
             <span className="font-medium">Auth Status:</span> {authEnabled === true ? 'Enabled' : authEnabled === false ? 'Disabled' : 'Unknown'}

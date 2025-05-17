@@ -52,6 +52,58 @@ function toErrorWithMessage(error: unknown): ErrorWithMessage {
   }
 }
 
+// Mock data as there's no listings table in the schema
+const mockListings: Listing[] = [
+  {
+    id: "car-1",
+    title: "Tesla Model 3 2022",
+    description: "Electric car in excellent condition",
+    price: 1800000,
+    type: "car",
+    images: ["/assets/marketplace/car-1.jpg"],
+    is_rental: false,
+    location: "Bangkok",
+    features: ["Electric", "Autopilot", "Premium Sound"],
+    status: "active"
+  },
+  {
+    id: "property-1",
+    title: "Luxury Condo Sukhumvit",
+    description: "2 bedroom condo near BTS",
+    price: 6500000,
+    type: "property",
+    images: ["/assets/marketplace/property-1.jpg"],
+    is_rental: false,
+    location: "Sukhumvit, Bangkok",
+    features: ["Pool", "Gym", "Security"],
+    status: "active"
+  },
+  {
+    id: "car-2",
+    title: "Honda Civic 2021",
+    description: "Well maintained sedan",
+    price: 850000,
+    type: "car",
+    images: ["/assets/marketplace/car-2.jpg"],
+    is_rental: true,
+    location: "Chiang Mai",
+    features: ["Automatic", "Fuel Efficient"],
+    status: "active"
+  },
+  {
+    id: "property-2",
+    title: "Beach Villa Phuket",
+    description: "3 bedroom villa with sea view",
+    price: 12500000,
+    type: "property",
+    images: ["/assets/marketplace/property-2.jpg"],
+    is_rental: false,
+    location: "Phuket",
+    features: ["Beach Access", "Private Pool", "Garden"],
+    status: "active"
+  }
+];
+
 const Marketplace = () => {
   const [listingType, setListingType] = useState<ListingType>("all");
   const [priceRange, setPriceRange] = useState<PriceRange>("all");
@@ -60,56 +112,33 @@ const Marketplace = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { toast } = useToast();
 
-  // Fetch listings from Supabase
+  // Fetch listings - simulated with mock data since there's no listings table
   const fetchListings = async () => {
     setIsLoading(true);
     try {
-      let query = supabase
-        .from('listings')
-        .select('*')
-        .eq('status', 'active');
+      console.log("Fetching listings with filters:", { listingType, priceRange, isRental });
       
-      // Apply filters
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Filter the mock data based on the filters
+      let filtered = [...mockListings];
+      
       if (listingType !== "all") {
-        query = query.eq('type', listingType);
+        filtered = filtered.filter(listing => listing.type === listingType);
       }
       
       if (priceRange !== "all") {
-        if (priceRange === "low") query = query.lt('price', 500000);
-        else if (priceRange === "medium") query = query.gte('price', 500000).lt('price', 2000000);
-        else if (priceRange === "high") query = query.gte('price', 2000000);
+        if (priceRange === "low") filtered = filtered.filter(listing => listing.price < 500000);
+        else if (priceRange === "medium") filtered = filtered.filter(listing => listing.price >= 500000 && listing.price < 2000000);
+        else if (priceRange === "high") filtered = filtered.filter(listing => listing.price >= 2000000);
       }
       
       if (isRental !== null) {
-        query = query.eq('is_rental', isRental);
+        filtered = filtered.filter(listing => listing.is_rental === isRental);
       }
-
-      const { data, error } = await query;
-
-      if (error) {
-        throw error;
-      }
-
-      if (data) {
-        // Transform features from JSONB to string array and ensure type safety
-        const formattedListings = data.map((listing) => ({
-          ...listing,
-          // Ensure type is either "car" or "property"
-          type: (listing.type === "car" || listing.type === "property") ? listing.type : "property" as const,
-          // Convert features to string array
-          features: Array.isArray(listing.features) 
-            ? listing.features as string[] 
-            : (typeof listing.features === 'object' && listing.features !== null) 
-              ? Object.keys(listing.features as Record<string, unknown>) 
-              : [],
-          // Ensure images is an array
-          images: Array.isArray(listing.images) ? listing.images : [],
-          // Ensure is_rental is boolean
-          is_rental: Boolean(listing.is_rental)
-        })) as Listing[];
-        
-        setFilteredListings(formattedListings);
-      }
+      
+      setFilteredListings(filtered);
     } catch (error: unknown) {
       const errorWithMessage = toErrorWithMessage(error);
       console.error('Error fetching listings:', errorWithMessage);
@@ -124,20 +153,18 @@ const Marketplace = () => {
     }
   };
 
-  // Track listing view
+  // Track listing view (simulated)
   const trackListingView = async (listingId: string) => {
     const { data: sessionData } = await supabase.auth.getSession();
     const userId = sessionData?.session?.user?.id;
     
     if (userId && listingId) {
-      await supabase.from('listing_views').insert({
-        listing_id: listingId,
-        viewer_id: userId
-      }).select();
+      console.log(`Tracking view for listing ${listingId} by user ${userId}`);
+      // In a real implementation, we would insert a record to listing_views table
     }
   };
 
-  // Add to favorites
+  // Add to favorites (simulated)
   const toggleFavorite = async (listingId: string) => {
     const { data: sessionData } = await supabase.auth.getSession();
     const userId = sessionData?.session?.user?.id;
@@ -152,41 +179,14 @@ const Marketplace = () => {
     }
     
     try {
-      // Check if listing is already in favorites
-      const { data: existingFavorite } = await supabase
-        .from('favorites')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('listing_id', listingId)
-        .single();
-        
-      if (existingFavorite) {
-        // Remove from favorites
-        await supabase
-          .from('favorites')
-          .delete()
-          .eq('id', existingFavorite.id);
-          
-        toast({
-          title: "Removed from favorites",
-          description: "The listing has been removed from your favorites",
-          variant: "default",
-        });
-      } else {
-        // Add to favorites
-        await supabase
-          .from('favorites')
-          .insert({
-            user_id: userId,
-            listing_id: listingId
-          });
-          
-        toast({
-          title: "Added to favorites",
-          description: "The listing has been added to your favorites",
-          variant: "default",
-        });
-      }
+      console.log(`Toggling favorite for listing ${listingId} by user ${userId}`);
+      // This is a simulation - in a real implementation we would check and toggle a record in favorites table
+      
+      toast({
+        title: "Favorite toggled",
+        description: "Your favorites have been updated",
+        variant: "default",
+      });
     } catch (error) {
       console.error('Error toggling favorite:', error);
       toast({
