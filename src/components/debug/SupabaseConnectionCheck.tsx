@@ -26,7 +26,7 @@ export const SupabaseConnectionCheck = () => {
       if (timeError) throw timeError;
       
       // Check specific tables we know exist in the database schema
-      const tablesToCheck = ['users', 'payments', 'reservations', 'stores'];
+      const tablesToCheck = ['users', 'payments', 'reservations', 'stores'] as const;
       const availableTables: string[] = [];
       
       for (const tableName of tablesToCheck) {
@@ -88,7 +88,7 @@ export const SupabaseConnectionCheck = () => {
       {connectionStatus === 'connected' && (
         <div className="space-y-2">
           <div>
-            <span className="font-medium">Project URL:</span> {supabase.supabaseUrl ? supabase.supabaseUrl : "https://vpzhincrxgxyyzulmrzs.supabase.co"}
+            <span className="font-medium">Project URL:</span> {"https://vpzhincrxgxyyzulmrzs.supabase.co"}
           </div>
           <div>
             <span className="font-medium">Auth Status:</span> {authEnabled === true ? 'Enabled' : authEnabled === false ? 'Disabled' : 'Unknown'}

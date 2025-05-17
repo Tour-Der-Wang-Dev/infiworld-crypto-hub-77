@@ -10,11 +10,3 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
-// Expose the URL for use in components
-Object.defineProperty(supabase, 'supabaseUrl', {
-  value: SUPABASE_URL,
-  writable: false,
-  enumerable: true,
-  configurable: false
-});
