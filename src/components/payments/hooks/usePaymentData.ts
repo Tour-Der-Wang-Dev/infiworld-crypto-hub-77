@@ -1,10 +1,8 @@
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Transaction, PaymentType } from "@/components/payments/types";
-import { formatTransactionData } from "@/utils/payment-utils";
 
 export const usePaymentData = (initialLimit?: number) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -50,7 +48,37 @@ export const usePaymentData = (initialLimit?: number) => {
       ];
       
       // Transform the mock data to match our Transaction type
-      const formattedData = formatTransactionData(mockData);
+      const formattedData = mockData.map((item): Transaction => {
+        const escrow = item.escrow_transactions && item.escrow_transactions.length > 0 
+          ? item.escrow_transactions[0] 
+          : undefined;
+          
+        return {
+          id: item.id,
+          amount: item.amount,
+          currency: item.currency,
+          payment_method: item.payment_method,
+          payment_status: item.payment_status,
+          related_type: item.related_type,
+          related_id: item.related_id,
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          receipt_url: item.receipt_url,
+          refund_status: item.refund_status,
+          refunded_amount: item.refunded_amount,
+          escrow: escrow ? {
+            id: escrow.id,
+            paymentId: escrow.payment_id,
+            buyerId: escrow.buyer_id,
+            sellerId: escrow.seller_id,
+            status: escrow.escrow_status,
+            contractDetails: escrow.contract_details,
+            releaseConditions: escrow.release_conditions,
+            releaseDate: escrow.release_date ? new Date(escrow.release_date) : undefined
+          } : undefined
+        };
+      });
+      
       setTransactions(formattedData);
     } catch (error: any) {
       console.error("Error fetching transactions:", error);

@@ -67,3 +67,24 @@ export interface TransactionsListProps {
   filterType?: PaymentType;
   showEscrowOnly?: boolean;
 }
+
+export interface PaymentMethodsProps {
+  amount: number;
+  currency?: string;
+  onPaymentSubmit: (method: string) => Promise<void>;
+  onCancel: () => void;
+  isProcessing: boolean;
+  paymentType: PaymentType;
+}
+
+export interface PaymentModalProps {
+  open: boolean;
+  onClose: () => void;
+  amount: number;
+  currency?: string;
+  paymentType: PaymentType;
+  relatedId: string;
+  onSuccess?: (paymentId: string) => void;
+  useEscrow?: boolean;
+  sellerId?: string;
+}

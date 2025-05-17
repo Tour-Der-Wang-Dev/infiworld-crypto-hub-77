@@ -1,24 +1,54 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { Transaction, PaymentStatus, EscrowStatus } from "@/components/payments/types";
+import { Transaction } from "@/components/payments/types";
 
-/**
- * Determines if a transaction can request a refund
- * @param transaction - Transaction object to check
- * @returns Boolean indicating if refund can be requested
- */
+export const formatTransactionData = (data: any[]): Transaction[] => {
+  if (!data || !Array.isArray(data)) return [];
+  
+  try {
+    return data.map((item): Transaction => {
+      const escrowData = item.escrow_transactions && item.escrow_transactions.length > 0 
+        ? item.escrow_transactions[0] 
+        : undefined;
+      
+      return {
+        id: item.id,
+        amount: item.amount,
+        currency: item.currency || 'THB',
+        payment_method: item.payment_method,
+        payment_status: item.payment_status,
+        related_type: item.related_type,
+        related_id: item.related_id,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        receipt_url: item.receipt_url,
+        refund_status: item.refund_status,
+        refunded_amount: item.refunded_amount,
+        escrow: escrowData ? {
+          id: escrowData.id,
+          paymentId: escrowData.payment_id,
+          buyerId: escrowData.buyer_id,
+          sellerId: escrowData.seller_id,
+          status: escrowData.escrow_status,
+          contractDetails: escrowData.contract_details,
+          releaseConditions: escrowData.release_conditions,
+          releaseDate: escrowData.release_date ? new Date(escrowData.release_date) : undefined
+        } : undefined
+      };
+    });
+  } catch (error) {
+    console.error("Error formatting transaction data:", error);
+    return [];
+  }
+};
+
+// Can the user request a refund for this transaction?
 export const canRequestRefund = (transaction: Transaction): boolean => {
   return transaction.payment_status === 'completed' && 
     !transaction.refund_status &&
     !transaction.escrow;
 };
 
-/**
- * Determines if a transaction's escrow can be released
- * @param transaction - Transaction object to check
- * @param userId - Current user ID
- * @returns Boolean indicating if escrow can be released
- */
+// Can the user release escrow funds for this transaction?
 export const canReleaseEscrow = (transaction: Transaction, userId?: string): boolean => {
   if (!userId) return false;
   return !!transaction.escrow && 
@@ -26,18 +56,14 @@ export const canReleaseEscrow = (transaction: Transaction, userId?: string): boo
     transaction.escrow.buyerId === userId;
 };
 
-/**
- * Requests a refund for a transaction
- * @param transactionId - ID of the transaction to refund
- * @param userId - ID of the user requesting the refund
- * @returns Promise with success status
- */
+// Utility to request a refund - useful for testing
 export const requestRefund = async (
   transactionId: string, 
-  userId: string
-): Promise<{ success: boolean; error?: any }> => {
+  userId: string,
+  supabaseClient: any
+): Promise<{success: boolean, error?: any}> => {
   try {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from("transactions")
       .update({ 
         refund_status: "requested",
@@ -49,36 +75,6 @@ export const requestRefund = async (
     if (error) throw error;
     return { success: true };
   } catch (error) {
-    console.error("Error requesting refund:", error);
-    return { success: false, error };
-  }
-};
-
-/**
- * Releases funds from an escrow transaction
- * @param escrowId - ID of the escrow transaction
- * @param userId - ID of the buyer releasing the funds
- * @returns Promise with success status
- */
-export const releaseEscrow = async (
-  escrowId: string,
-  userId: string
-): Promise<{ success: boolean; error?: any }> => {
-  try {
-    const { error } = await supabase
-      .from("escrow_transactions")
-      .update({ 
-        escrow_status: "released" as EscrowStatus,
-        release_date: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .eq("id", escrowId)
-      .eq("buyer_id", userId);
-    
-    if (error) throw error;
-    return { success: true };
-  } catch (error) {
-    console.error("Error releasing escrow:", error);
     return { success: false, error };
   }
 };
