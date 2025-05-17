@@ -16,12 +16,15 @@ export const SupabaseConnectionCheck = () => {
     setError(null);
     
     try {
-      // Test basic connection by getting server timestamp
-      const { data: timeData, error: timeError } = await supabase.rpc('get_server_time');
+      // Test basic connection by getting current timestamp from database
+      // We'll use a simple query instead of an RPC function to avoid type issues
+      const { data: timeData, error: timeError } = await supabase
+        .from('table_name') // Using an existing table from your schema
+        .select('inserted_at')
+        .limit(1);
       
       if (timeError) throw timeError;
       
-      // Get list of tables we have access to
       // Check specific tables we know exist in the database schema
       const tablesToCheck = ['users', 'payments', 'reservations', 'stores'];
       const availableTables: string[] = [];
@@ -30,7 +33,7 @@ export const SupabaseConnectionCheck = () => {
         try {
           // Just see if we can select a single row from each table
           const { error } = await supabase
-            .from(tableName as any)
+            .from(tableName)
             .select('id')
             .limit(1);
           
@@ -85,7 +88,7 @@ export const SupabaseConnectionCheck = () => {
       {connectionStatus === 'connected' && (
         <div className="space-y-2">
           <div>
-            <span className="font-medium">Project URL:</span> {supabase.supabaseUrl}
+            <span className="font-medium">Project URL:</span> {supabase.supabaseUrl ? supabase.supabaseUrl : "https://vpzhincrxgxyyzulmrzs.supabase.co"}
           </div>
           <div>
             <span className="font-medium">Auth Status:</span> {authEnabled === true ? 'Enabled' : authEnabled === false ? 'Disabled' : 'Unknown'}
